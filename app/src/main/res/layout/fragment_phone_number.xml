@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FragmentPhoneNumber"
-    android:background="@drawable/bg">
+    tools:context=".FragmentPhoneNumber">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -39,11 +38,15 @@
             android:layout_marginEnd="16dp"
             android:ems="10"
             android:hint="+7(888)999-99-99"
-            android:inputType="phone"
+            android:maxLength="16"
+            android:digits="0123456789"
+            android:inputType="number"
             android:minHeight="48dp"
             android:textAlignment="center"
             android:textColor="@color/orange"
-            android:textColorHint="@color/white"
+            android:textColorHint="@color/light_gray"
+            android:textSize="28sp"
+            android:backgroundTint="@color/orange"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
