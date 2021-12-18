@@ -2,8 +2,6 @@ package com.example.yelloclient;
 
 import android.os.Bundle;
 
-import androidx.fragment.app.Fragment;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -12,7 +10,7 @@ import android.view.ViewGroup;
 
 import com.example.yelloclient.databinding.FragmentPhoneNumberBinding;
 
-public class FragmentPhoneNumber extends Fragment {
+public class FragmentPhoneNumber extends BaseFragment {
 
     private FragmentPhoneNumberBinding _b;
 
@@ -21,6 +19,7 @@ public class FragmentPhoneNumber extends Fragment {
                              Bundle savedInstanceState) {
         _b = FragmentPhoneNumberBinding.inflate(getLayoutInflater(), container, false);
         _b.edtPhone.addTextChangedListener(numWatcher);
+        _b.btnNext.setOnClickListener(this);
         return _b.getRoot();
     }
 
@@ -74,4 +73,19 @@ public class FragmentPhoneNumber extends Fragment {
             oldValue = editable.toString();
         }
     };
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btnNext:
+                setControlsEnabled(false);
+                break;
+        }
+    }
+
+    private void setControlsEnabled(boolean v) {
+        _b.pbNextSMS.setVisibility(v ? View.GONE : View.VISIBLE);
+        _b.btnNext.setEnabled(v);
+        _b.edtPhone.setEnabled(v);
+    }
 }
