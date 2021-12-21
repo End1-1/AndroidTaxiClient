@@ -1,6 +1,18 @@
 <resources>
-    <string name="app_name">YelloClient</string>
+    <string name="app_name">YellowClient</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="NEXT">ДАЛЕЕ</string>
+    <string name="Loading">Загрузка</string>
+    <string name="InternetFail">У нас проблемы с интернетом</string>
+    <string name="PHONE_NUMBER">НОМЕР ТЕЛЕФОНА</string>
+    <string name="RESEND_SMS">ОТПРАВИТЬ СМС ПОВТОРНО</string>
+    <string name="PrivatePolicy">Ознакомиться с политикой приватности</string>
+    <string name="PressNextIfYouAccept">Нажмите делее, если вы согласны с </string>
+    <string name="CONDITIONS">УСЛОВИЯМИ</string>
+    <string name="Empty"></string>
+    <string name="background_location_permission_title">Права на получение координат</string>
+    <string name="background_location_permission_message">Для корректной работы приложения необходимо разрешить получение координат</string>
+    <string name="YES">ДА</string>
+    <string name="NO">НЕТ</string>
 </resources>

@@ -1,5 +1,32 @@
 package com.example.yelloclient;
 
+import static org.apache.http.conn.ssl.SSLSocketFactory.SSL;
+
+import android.os.Handler;
+import android.os.Looper;
+
+import org.conscrypt.Conscrypt;
+
+import java.io.IOException;
+import java.security.Security;
+import java.security.cert.CertificateException;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okio.Buffer;
+
 public class WebRequest {
 
     public enum  HttpMethod {
@@ -8,37 +35,39 @@ public class WebRequest {
         PUT
     }
 
+    public interface HttpResponse {
+        void httpRespone(int httpReponseCode, String data);
+    }
+
     private String mUrl;
     private HttpMethod mMethod;
-    private int mResponseCode;
-    private WebResponse mWebResponse;
+    private HttpResponse mWebResponse;
     private Map<String, String> mHeader;
     private Map<String, String> mParameters;
     private String mData;
-    private int mWebResponseCode;
+    private int mHttpResponseCode;
     private String mOutputData;
 
-    public WebQuery(String url, HttpMethod method, int responseCode, WebResponse r) {
+    public WebRequest(String url, HttpMethod method, HttpResponse r) {
         mData = "";
         mOutputData = "";
-        mWebResponseCode = 0;
+        mHttpResponseCode = 0;
         mHeader = new HashMap<>();
         mParameters = new HashMap<>();
-        mUrl = url;
+        mUrl = "https://" + Config.host() + url;
         mMethod = method;
-        mResponseCode = responseCode;
         mWebResponse = r;
 
-        setHeader("Authorization", "Bearer " + UPref.mBearerKey);
+        setHeader("Authorization", "Bearer " + Config.bearerKey());
         setHeader("Accept", "application/json");
     }
 
-    public WebQuery setHeader(String key, String value) {
+    public WebRequest setHeader(String key, String value) {
         mHeader.put(key, value);
         return this;
     }
 
-    public WebQuery setParameter(String key, String value) {
+    public WebRequest setParameter(String key, String value) {
         mParameters.put(key, value);
         return this;
     }
@@ -75,23 +104,25 @@ public class WebRequest {
                 System.out.println(buffer.readUtf8());
                 Response response = httpClient.newCall(builder.build()).execute();
                 if (!response.isSuccessful()) {
-                    throw new IOException("Unexpected code " + Integer.toString(response.code()) + " " + response.body().string());
+                    mHttpResponseCode = response.code();
+                    throw new IOException(response.body().string());
                 }
-                mWebResponseCode = 200;
+                mHttpResponseCode = response.code();
                 mOutputData = response.body().string();
                 System.out.println(mOutputData);
             }
             catch (Exception e) {
                 mOutputData = e.getMessage();
-                mWebResponseCode = 500;
-                System.out.println(mResponseCode);
+                if (mHttpResponseCode == 0) {
+                    mHttpResponseCode = -1;
+                }
                 e.printStackTrace();
             }
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
                     if (mWebResponse != null) {
-                        mWebResponse.webResponse(mResponseCode, mWebResponseCode, mOutputData);
+                        mWebResponse.httpRespone(mHttpResponseCode, mOutputData);
                     }
                 }
             });
@@ -99,8 +130,8 @@ public class WebRequest {
         thread.start();
     }
 
-    public static WebQuery create(String url, HttpMethod method, int responseCode, WebResponse r) {
-        return new WebQuery(url, method, responseCode, r);
+    public static WebRequest create(String url, HttpMethod method, HttpResponse r) {
+        return new WebRequest(url, method, r);
     }
 
     private OkHttpClient getUnsafeOkHttpClient() {

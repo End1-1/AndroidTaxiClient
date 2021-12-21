@@ -15,8 +15,8 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fr"
-        android:name="com.example.yelloclient.FragmentPhoneNumber"
+        android:name="com.example.yelloclient.FragmentEmpty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:layout="@layout/fragment_phone_number" />
+        tools:layout="@layout/fragment_intro" />
 </FrameLayout>

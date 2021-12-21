@@ -1,5 +1,7 @@
 package com.example.yelloclient;
 
+import static com.example.yelloclient.BaseActivity.FC_NAVIGATE_SMS_CODE;
+
 import android.os.Bundle;
 
 import android.text.Editable;
@@ -9,9 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.yelloclient.databinding.FragmentPhoneNumberBinding;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class FragmentPhoneNumber extends BaseFragment {
 
+    public static String tag = "FragmentPhoneNumber";
     private FragmentPhoneNumberBinding _b;
 
     @Override
@@ -79,6 +84,11 @@ public class FragmentPhoneNumber extends BaseFragment {
         switch (view.getId()) {
             case R.id.btnNext:
                 setControlsEnabled(false);
+                Preference.setString("phone", _b.edtPhone.getText().toString());
+                Preference.setString("clear_phone", _b.edtPhone.getText().toString().replace("+", "").replace("(", "").replace(")", "").replace("-", ""));
+                WebRequest.create("/app/mobile/register", WebRequest.HttpMethod.POST, requestRegister)
+                        .setParameter("phone", Preference.getString("clear_phone"))
+                        .request();
                 break;
         }
     }
@@ -88,4 +98,18 @@ public class FragmentPhoneNumber extends BaseFragment {
         _b.btnNext.setEnabled(v);
         _b.edtPhone.setEnabled(v);
     }
+
+    WebRequest.HttpResponse requestRegister = (httpReponseCode, data) -> {
+        setControlsEnabled(true);
+        if (httpReponseCode == -1) {
+            _b.txtMessage.setText(R.string.InternetFail);
+        } else if (httpReponseCode < 300) {
+            JsonObject jo = JsonParser.parseString(data).getAsJsonObject();
+            Preference.setString("sms_message", jo.get("message").getAsString());
+            mActivity.fragmentCallback(FC_NAVIGATE_SMS_CODE);
+        } else {
+            JsonObject jo = JsonParser.parseString(data).getAsJsonObject();
+            _b.txtMessage.setText(jo.get("message").getAsString());
+        }
+    };
 }
