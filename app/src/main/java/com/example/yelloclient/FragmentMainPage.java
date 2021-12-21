@@ -1,5 +1,7 @@
 package com.example.yelloclient;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -29,6 +31,7 @@ public class FragmentMainPage extends BaseFragment {
                              Bundle savedInstanceState) {
         _b = FragmentMainPageBinding.inflate(getLayoutInflater(), container, false);
         MapKitFactory.initialize(getContext());
+        _b.btnMinimize.setOnClickListener(this);
         return _b.getRoot();
     }
 
@@ -52,7 +55,11 @@ public class FragmentMainPage extends BaseFragment {
 
     @Override
     public void onClick(View view) {
-
+        switch (view.getId()) {
+            case R.id.btnMinimize:
+                showHideFragment();
+                break;
+        }
     }
 
     PlacemarkMapObject mPlaceMark;
@@ -76,4 +83,23 @@ public class FragmentMainPage extends BaseFragment {
             mPlaceMark.setGeometry(cameraPosition.getTarget());
         }
     };
+
+    public void showHideFragment() {
+        ObjectAnimator animation = ObjectAnimator.ofFloat(_b.fr, "translationY", 100f);
+        animation.setDuration(2000);
+        animation.start();
+
+//        ValueAnimator anim = ValueAnimator.ofInt(_b.fr.getMeasuredHeight(), -500);
+//        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+//            @Override
+//            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+//                int val = (Integer) valueAnimator.getAnimatedValue();
+//                ViewGroup.LayoutParams layoutParams = _b.fr.getLayoutParams();
+//                layoutParams.height = val;
+//                _b.fr.setLayoutParams(layoutParams);
+//            }
+//        });
+//        anim.setDuration(1500);
+//        anim.start();
+    }
 }

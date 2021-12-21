@@ -90,7 +90,7 @@ public class FragmentIntro extends BaseFragment {
                 ((MainActivity) mActivity).mPaymentTypes = g.fromJson(jo.get("data").getAsJsonObject(), PaymentTypes.class);
                 ((MainActivity) mActivity).mCompanies = g.fromJson(jo.get("data").getAsJsonObject(), Companies.class);
                 mActivity.fragmentCallback(FC_NAVIGATE_MAINPAGE);
-            } else if (httpReponseCode == 401){
+            } else if (httpReponseCode == 401) {
                 mActivity.fragmentCallback(FC_NAVIGATE_LOGIN);
             } else {
                 _b.txtStatus.setText(data);

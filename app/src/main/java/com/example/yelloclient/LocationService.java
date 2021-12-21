@@ -36,12 +36,7 @@ public class LocationService {
                 }
             });
         } else {
-            locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, new LocationListener() {
-                @Override
-                public void onLocationChanged(@NonNull Location location) {
-                    locationListener.location(location);
-                }
-            }, null);
+            locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, location -> locationListener.location(location), null);
         }
     }
 

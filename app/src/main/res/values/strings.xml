@@ -15,4 +15,8 @@
     <string name="background_location_permission_message">Для корректной работы приложения необходимо разрешить получение координат</string>
     <string name="YES">ДА</string>
     <string name="NO">НЕТ</string>
+    <string name="ORDERTAXI">ЗАКАЗ ТАКСИ</string>
+    <string name="RENTTAXI">АРЕНДА ТАКСИ</string>
+    <string name="From">Откуда</string>
+    <string name="To">Куда</string>
 </resources>
