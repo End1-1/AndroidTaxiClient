@@ -38,20 +38,22 @@
                 android:id="@+id/llCont2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingRight="5dp"
-                android:paddingLeft="5dp"
                 android:background="@color/white"
                 android:orientation="vertical">
 
                 <LinearLayout
                     android:id="@+id/llOrderButton"
+                    android:paddingRight="10dp"
+                    android:paddingLeft="10dp"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <Button
                         android:id="@+id/btnTaxi"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="5dp"
                         android:layout_weight="1"
@@ -59,27 +61,27 @@
 
                     <Button
                         android:id="@+id/btnRent"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/RENTTAXI" />
                 </LinearLayout>
 
                 <View
-                    android:id="@+id/view3"
-                    android:layout_width="match_parent"
-                    android:layout_height="2dp" />
-
-                <View
                     android:id="@+id/view"
                     android:layout_width="match_parent"
-                    android:layout_height="1dp" />
+                    android:layout_height="1dp"
+                    android:background="@color/light_gray" />
 
                 <LinearLayout
                     android:id="@+id/llFrom"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
+                    android:paddingRight="10dp"
+                    android:paddingLeft="10dp"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
                     android:orientation="horizontal">
 
                     <ImageView
@@ -95,8 +97,8 @@
                         android:layout_weight="1"
                         android:ems="10"
                         android:hint="@string/From"
-                        android:textColorHint="@color/light_gray"
-                        android:inputType="text" />
+                        android:inputType="text"
+                        android:textColorHint="@color/light_gray" />
 
                     <ImageButton
                         android:id="@+id/btnMapFrom"
@@ -110,12 +112,17 @@
                 <View
                     android:id="@+id/view2"
                     android:layout_width="match_parent"
-                    android:layout_height="1dp" />
+                    android:layout_height="1dp"
+                    android:background="@color/light_gray" />
 
                 <LinearLayout
                     android:id="@+id/llTo"
+                    android:paddingRight="10dp"
+                    android:paddingLeft="10dp"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:gravity="center"
                     android:orientation="horizontal">
 
@@ -132,8 +139,8 @@
                         android:layout_weight="1"
                         android:ems="10"
                         android:hint="@string/To"
-                        android:textColorHint="@color/light_gray"
-                        android:inputType="text" />
+                        android:inputType="text"
+                        android:textColorHint="@color/light_gray" />
 
                     <ImageButton
                         android:id="@+id/btnMapto"
@@ -145,6 +152,90 @@
                 </LinearLayout>
 
             </LinearLayout>
+
+            <View
+                android:id="@+id/view4"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/light_gray"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvCars"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@color/white"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+
+            <View
+                android:id="@+id/view5"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/light_gray"/>
+
+            <LinearLayout
+                android:id="@+id/llOptions"
+                android:paddingRight="10dp"
+                android:paddingLeft="10dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:background="@color/white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnOptions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:text="@string/Options" />
+
+                <Button
+                    android:id="@+id/btnPaymentType"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/Cash" />
+            </LinearLayout>
+
+            <View
+                android:id="@+id/view6"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/light_gray" />
+
+        <LinearLayout
+            android:id="@+id/llOrder"
+            android:paddingRight="20dp"
+            android:paddingLeft="10dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:background="@color/white"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnORDER"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:layout_marginRight="10dp"
+                android:text="@string/ORDER" />
+
+            <ImageButton
+                android:id="@+id/btnCalendar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/calendar"
+                android:scaleType="centerInside"
+                android:background="@null"
+                android:text="@string/Cash" />
+
+        </LinearLayout>
 
         </LinearLayout>
 

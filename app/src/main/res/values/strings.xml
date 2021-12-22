@@ -19,4 +19,9 @@
     <string name="RENTTAXI">АРЕНДА ТАКСИ</string>
     <string name="From">Откуда</string>
     <string name="To">Куда</string>
+    <string name="R">₽</string>
+    <string name="Options">Опции</string>
+    <string name="ORDER">ЗАКАЗАТЬ</string>
+    <string name="Cash">Наличными</string>
+    <string name="Card">Кредитной картой</string>
 </resources>

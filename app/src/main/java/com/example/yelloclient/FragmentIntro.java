@@ -84,6 +84,7 @@ public class FragmentIntro extends BaseFragment {
                 Gson g = gb.create();
                 ((MainActivity) mActivity).mCarClasses = g.fromJson(jo.get("data").getAsJsonObject(), CarClasses.class);
                 for (int i = 0; i < ((MainActivity) mActivity).mCarClasses.car_classes.size(); i++) {
+                    ((MainActivity) mActivity).mCarClasses.car_classes.get(i).selected = i == 0 ? 1 : 0;
                     byte[] decodedString = Base64.decode(((MainActivity) mActivity).mCarClasses.car_classes.get(i).image, Base64.DEFAULT);
                     ((MainActivity) mActivity).mCarClasses.car_classes.get(i)._image = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
                 }
