@@ -24,4 +24,6 @@
     <string name="ORDER">ЗАКАЗАТЬ</string>
     <string name="Cash">Наличными</string>
     <string name="Card">Кредитной картой</string>
+    <string name="Back">Назад</string>
+    <string name="Ready">Готово</string>
 </resources>

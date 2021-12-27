@@ -2,11 +2,45 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    orientation="vertical"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".ActivitySuggestAddress">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp"
+        android:layout_gravity="center"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/imgBack"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_margin="5dp"
+            android:background="@null"
+            android:scaleType="fitXY"
+            app:srcCompat="@drawable/back" />
+
+        <TextView
+            android:id="@+id/txtBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="5dp"
+            android:text="@string/Back" />
+
+        <TextView
+            android:id="@+id/txtReady"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="5dp"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:text="@string/Ready" />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/llFrom"
@@ -30,15 +64,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
             android:ems="10"
             android:hint="@string/From"
             android:inputType="text"
-            android:textColorHint="@color/light_gray" />
+            android:clickable="true"
+            android:textColorHint="@color/light_gray"
+            android:background="@null"/>
 
         <ImageButton
             android:id="@+id/btnClearFrom"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:layout_marginRight="5dp"
             android:background="@null"
             android:scaleType="fitCenter"
@@ -81,15 +119,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
             android:ems="10"
             android:hint="@string/To"
             android:inputType="text"
-            android:textColorHint="@color/light_gray" />
+            android:clickable="true"
+            android:textColorHint="@color/light_gray"
+            android:background="@null"/>
 
         <ImageButton
             android:id="@+id/btnClearTo"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:layout_marginRight="5dp"
             android:background="@null"
             android:scaleType="fitCenter"
@@ -109,5 +151,10 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/light_gray" />
+
+    <ListView
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </LinearLayout>

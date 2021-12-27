@@ -1,6 +1,8 @@
 package com.example.yelloclient;
 
 import android.animation.ObjectAnimator;
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageDecoder;
@@ -13,6 +15,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -35,12 +41,44 @@ public class FragmentMainPage extends BaseFragment {
     public static final String tag = "FragmentMainPage";
 
     private FragmentMainPageBinding _b;
+    private boolean mLoading = false;
+
+    public FragmentMainPage() {
+        mAddr = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        if (result.getResultCode() == Activity.RESULT_OK) {
+                            Intent data = result.getData();
+                            if (data.getStringExtra("from_display") != null) {
+                                Preference.setString("from_display", data.getStringExtra("from_display"));
+                                Preference.setString("from_title", data.getStringExtra("from_title"));
+                                Preference.setString("from_subtitle", data.getStringExtra("from_subtitle"));
+                            } else {
+                                Preference.setString("from_display", "");
+                            }
+                            if (data.getStringExtra("to_display") != null) {
+                                Preference.setString("to_display", data.getStringExtra("to_display"));
+                                Preference.setString("to_title", data.getStringExtra("to_title"));
+                                Preference.setString("to_subtitle", data.getStringExtra("to_subtitle"));    
+                            } else {
+                                Preference.setString("to_display", "");
+                            }
+                            setLoading(true);
+                        }
+                    }
+                });
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         _b = FragmentMainPageBinding.inflate(getLayoutInflater(), container, false);
         MapKitFactory.initialize(getContext());
         _b.btnMinimize.setOnClickListener(this);
+        _b.edtFrom.setOnClickListener(this);
+        _b.edtTo.setOnClickListener(this);
         _b.rvCars.setAdapter(new CarClassAdapter());
         ViewTreeObserver vto = _b.getRoot().getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -77,7 +115,29 @@ public class FragmentMainPage extends BaseFragment {
             case R.id.btnMinimize:
                 showHideFragment();
                 break;
+            case R.id.edtFrom: {
+                Intent intent = new Intent(getContext(), ActivitySuggestAddress.class);
+                intent.putExtra("from", true);
+                mAddr.launch(intent);
+                break;
+            }
+            case R.id.edtTo: {
+                Intent intent = new Intent(getContext(), ActivitySuggestAddress.class);
+                intent.putExtra("from", false);
+                mAddr.launch(intent);
+                break;
+            }
         }
+    }
+
+    private void setLoading(boolean v) {
+        mLoading = true;
+        _b.rvCars.getAdapter().notifyDataSetChanged();
+        _b.btnMinimize.setEnabled(!v);
+        _b.btnTaxi.setEnabled(!v);
+        _b.btnORDER.setEnabled(!v);
+        _b.btnRent.setEnabled(!v);
+        _b.btnOptions.setEnabled(!v);
     }
 
     PlacemarkMapObject mPlaceMark;
@@ -157,6 +217,7 @@ public class FragmentMainPage extends BaseFragment {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                     ((AnimatedImageDrawable) drawable).start();
                 }
+                _b.gif.setVisibility(mLoading ? View.VISIBLE : View.INVISIBLE);
             }
 
             @Override
@@ -186,4 +247,6 @@ public class FragmentMainPage extends BaseFragment {
             return ((MainActivity) mActivity).mCarClasses.car_classes.size();
         }
     }
+
+    ActivityResultLauncher<Intent> mAddr;
 }

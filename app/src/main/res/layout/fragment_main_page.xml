@@ -80,8 +80,8 @@
                     android:gravity="center"
                     android:paddingRight="10dp"
                     android:paddingLeft="10dp"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
                     android:orientation="horizontal">
 
                     <ImageView
@@ -96,9 +96,13 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:ems="10"
+                        android:focusable="false"
                         android:hint="@string/From"
                         android:inputType="text"
-                        android:textColorHint="@color/light_gray" />
+                        android:clickable="true"
+                        android:textColorHint="@color/light_gray"
+                        android:background="@null"
+                        android:backgroundTint="@null"/>
 
                     <ImageButton
                         android:id="@+id/btnMapFrom"
@@ -119,8 +123,8 @@
                     android:id="@+id/llTo"
                     android:paddingRight="10dp"
                     android:paddingLeft="10dp"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
@@ -138,9 +142,13 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:ems="10"
+                        android:focusable="false"
                         android:hint="@string/To"
                         android:inputType="text"
-                        android:textColorHint="@color/light_gray" />
+                        android:clickable="true"
+                        android:textColorHint="@color/light_gray"
+                        android:background="@null"
+                        android:backgroundTint="@null" />
 
                     <ImageButton
                         android:id="@+id/btnMapto"

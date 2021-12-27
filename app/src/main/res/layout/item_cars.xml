@@ -38,10 +38,10 @@
 
         <ImageView
             android:id="@+id/gif"
-            android:src="@drawable/load1"
             android:layout_width="130dp"
             android:layout_height="90dp"
-            android:visibility="gone"/>
+            android:src="@drawable/load1"
+            android:visibility="invisible" />
 
     </LinearLayout>
 
