@@ -55,15 +55,19 @@ public class FragmentMainPage extends BaseFragment {
                                 Preference.setString("from_display", data.getStringExtra("from_display"));
                                 Preference.setString("from_title", data.getStringExtra("from_title"));
                                 Preference.setString("from_subtitle", data.getStringExtra("from_subtitle"));
+                                _b.edtFrom.setText(Preference.getString("from_title"));
                             } else {
                                 Preference.setString("from_display", "");
+                                _b.edtFrom.setText("");
                             }
                             if (data.getStringExtra("to_display") != null) {
                                 Preference.setString("to_display", data.getStringExtra("to_display"));
                                 Preference.setString("to_title", data.getStringExtra("to_title"));
-                                Preference.setString("to_subtitle", data.getStringExtra("to_subtitle"));    
+                                Preference.setString("to_subtitle", data.getStringExtra("to_subtitle"));
+                                _b.edtTo.setText(Preference.getString("to_title"));
                             } else {
                                 Preference.setString("to_display", "");
+                                _b.edtTo.setText("");
                             }
                             setLoading(true);
                         }

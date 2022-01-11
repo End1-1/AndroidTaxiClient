@@ -1,24 +1,19 @@
 package com.example.yelloclient;
 
 import android.Manifest;
-import android.animation.ValueAnimator;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentContainer;
-import androidx.fragment.app.FragmentContainerView;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.yelloclient.classes.CarClasses;
 import com.example.yelloclient.classes.Companies;
 import com.example.yelloclient.classes.PaymentTypes;
-
 import com.example.yelloclient.databinding.ActivityMainBinding;
 
 public class MainActivity extends BaseActivity {
@@ -103,8 +98,6 @@ public class MainActivity extends BaseActivity {
         fragmentTransaction.replace(R.id.fr, fr, tag);
         fragmentTransaction.commit();
     }
-
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
