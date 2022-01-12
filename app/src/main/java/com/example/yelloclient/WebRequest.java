@@ -5,9 +5,13 @@ import static org.apache.http.conn.ssl.SSLSocketFactory.SSL;
 import android.os.Handler;
 import android.os.Looper;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import org.conscrypt.Conscrypt;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.Security;
 import java.security.cert.CertificateException;
 import java.util.HashMap;
@@ -21,11 +25,13 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import okhttp3.FormBody;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okio.Buffer;
+import okio.BufferedSink;
 
 public class WebRequest {
 
@@ -44,12 +50,11 @@ public class WebRequest {
     private HttpResponse mWebResponse;
     private Map<String, String> mHeader;
     private Map<String, String> mParameters;
-    private String mData;
+    private String mBody = "";
     private int mHttpResponseCode;
     private String mOutputData;
 
     public WebRequest(String url, HttpMethod method, HttpResponse r) {
-        mData = "";
         mOutputData = "";
         mHttpResponseCode = 0;
         mHeader = new HashMap<>();
@@ -72,12 +77,21 @@ public class WebRequest {
         return this;
     }
 
+    public WebRequest setBody(String value) {
+        mBody = value;
+        return this;
+    }
+
     private RequestBody getBody() {
-        FormBody.Builder form = new FormBody.Builder();
-        for (Map.Entry<String, String> e: mParameters.entrySet()) {
-            form.add(e.getKey(), e.getValue());
+        if (mBody.isEmpty()) {
+            FormBody.Builder form = new FormBody.Builder();
+            for (Map.Entry<String, String> e : mParameters.entrySet()) {
+                form.add(e.getKey(), e.getValue());
+            }
+            return form.build();
+        } else {
+            return RequestBody.create(mBody.getBytes(StandardCharsets.UTF_8));
         }
-        return form.build();
     }
 
     public void request() {

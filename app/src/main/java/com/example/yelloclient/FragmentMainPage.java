@@ -1,5 +1,7 @@
 package com.example.yelloclient;
 
+import static com.example.yelloclient.BaseActivity.FC_NAVIGATE_INTRO;
+
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Intent;
@@ -10,6 +12,7 @@ import android.graphics.drawable.AnimatedImageDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +28,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.yelloclient.classes.CarClass;
 import com.example.yelloclient.databinding.FragmentMainPageBinding;
 import com.example.yelloclient.databinding.ItemCarsBinding;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.yandex.mapkit.MapKitFactory;
 import com.yandex.mapkit.geometry.Point;
 import com.yandex.mapkit.map.CameraListener;
@@ -35,6 +41,8 @@ import com.yandex.mapkit.map.PlacemarkMapObject;
 import com.yandex.runtime.image.ImageProvider;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 
 public class FragmentMainPage extends BaseFragment {
 
@@ -69,15 +77,29 @@ public class FragmentMainPage extends BaseFragment {
                                 Preference.setString("to_display", "");
                                 _b.edtTo.setText("");
                             }
-                            setLoading(true);
+                            initCoin();
                         }
                     }
                 });
     }
 
+    WebRequest.HttpResponse mInitCoin = new WebRequest.HttpResponse() {
+        @Override
+        public void httpRespone(int httpReponseCode, String data) {
+            setLoading(false);
+            if (httpReponseCode == -1) {
+
+            } else if (httpReponseCode < 300) {
+                JsonObject jo = JsonParser.parseString(data).getAsJsonObject().get("data").getAsJsonObject();
+
+            } else  {
+                JsonObject jo = JsonParser.parseString(data).getAsJsonObject();
+            }
+        }
+    };
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         _b = FragmentMainPageBinding.inflate(getLayoutInflater(), container, false);
         MapKitFactory.initialize(getContext());
         _b.btnMinimize.setOnClickListener(this);
@@ -142,6 +164,70 @@ public class FragmentMainPage extends BaseFragment {
         _b.btnORDER.setEnabled(!v);
         _b.btnRent.setEnabled(!v);
         _b.btnOptions.setEnabled(!v);
+    }
+
+    private void initCoin() {
+        setLoading(true);
+
+        JsonObject jo = new JsonObject();
+
+        JsonObject jcar = new JsonObject();
+        jcar.addProperty("class", ((MainActivity) mActivity).mCarClasses.getCurrent().class_id);
+        JsonArray jcarOptions = new JsonArray();
+        for (int o: ((MainActivity)  mActivity).mCarOptions) {
+            jcarOptions.add(o);
+        }
+        jcar.add("options", jcarOptions);
+        jcar.addProperty("comments", Preference.getString("driver_comment"));
+        jo.add("car", jcar);
+
+        JsonObject jpayment = new JsonObject();
+        jpayment.addProperty("type", ((MainActivity) mActivity).mPaymentTypes.getCurrent().id);
+        jpayment.addProperty("company", ((MainActivity) mActivity).mPaymentCompany);
+        jo.add("payment", jpayment);
+
+        JsonObject jroute = new JsonObject();
+        JsonArray jfromCoord = new JsonArray();
+        jfromCoord.add(Preference.getFloat("last_lat"));
+        jfromCoord.add(Preference.getFloat("last_lon"));
+        jroute.add("from", jfromCoord);
+        jroute.addProperty("from_address", Preference.getString("from_display"));
+
+        JsonArray jtoCoord = new JsonArray();
+        if (Preference.getFloat("to_lat") > 0.01) {
+            jtoCoord.add(Preference.getFloat("to_lat"));
+            jtoCoord.add(Preference.getFloat("to_lon"));
+        }
+        jroute.add("to", jtoCoord);
+        jroute.addProperty("to_address", Preference.getString("to_display"));
+        jo.add("route", jroute);
+
+        JsonObject jtime = new JsonObject();
+        android.text.format.DateFormat df = new android.text.format.DateFormat();
+        jtime.addProperty("zone", "Asia/Yerevan");
+        jtime.addProperty("create_time", df.format("yyyy-MM-dd HH:mm", Calendar.getInstance().getTime()).toString());
+        jtime.addProperty("time", df.format("yyyy-MM-dd HH:mm", Calendar.getInstance().getTime()).toString());
+        jo.add("time", jtime);
+
+        JsonObject jphone = new JsonObject();
+        jphone.addProperty("client", Preference.getString("phone"));
+        jphone.addProperty("passanger", "");
+        jo.add("phone", jphone);
+
+        JsonObject jmeet = new JsonObject();
+        jmeet.addProperty("is_meet", false);
+        jmeet.addProperty("place_id", "");
+        jmeet.addProperty("place_type", "");
+        jmeet.addProperty("number", "");
+        jmeet.addProperty("text", "");
+        jo.add("meet", jmeet);
+
+        jo.addProperty("is_rent", ((MainActivity) mActivity).mIsRent);
+        jo.addProperty("rent_time", ((MainActivity) mActivity).mRentTime);
+
+        WebRequest.create("/app/mobile/init_coin", WebRequest.HttpMethod.POST, mInitCoin)
+                .setBody(jo.toString())
+                .request();
     }
 
     PlacemarkMapObject mPlaceMark;

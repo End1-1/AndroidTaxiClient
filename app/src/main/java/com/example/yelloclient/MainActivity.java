@@ -16,13 +16,20 @@ import com.example.yelloclient.classes.Companies;
 import com.example.yelloclient.classes.PaymentTypes;
 import com.example.yelloclient.databinding.ActivityMainBinding;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends BaseActivity {
 
     private ActivityMainBinding _b;
     static final private int REQUEST_LOCATION = 1;
     public CarClasses mCarClasses;
+    public List<Integer> mCarOptions = new ArrayList<>();
     public PaymentTypes mPaymentTypes;
+    public Integer mPaymentCompany = 0;
     public Companies mCompanies;
+    public boolean mIsRent = false;
+    public Integer mRentTime = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

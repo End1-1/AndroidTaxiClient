@@ -89,6 +89,9 @@ public class FragmentIntro extends BaseFragment {
                     ((MainActivity) mActivity).mCarClasses.car_classes.get(i)._image = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
                 }
                 ((MainActivity) mActivity).mPaymentTypes = g.fromJson(jo.get("data").getAsJsonObject(), PaymentTypes.class);
+                if (((MainActivity) mActivity).mPaymentTypes.payment_types.size() > 0) {
+                    ((MainActivity) mActivity).mPaymentTypes.payment_types.get(0).selected = true;
+                }
                 ((MainActivity) mActivity).mCompanies = g.fromJson(jo.get("data").getAsJsonObject(), Companies.class);
                 mActivity.fragmentCallback(FC_NAVIGATE_MAINPAGE);
             } else if (httpReponseCode == 401) {
