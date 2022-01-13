@@ -18,6 +18,7 @@ import com.example.yelloclient.classes.PaymentTypes;
 import com.example.yelloclient.databinding.FragmentIntroBinding;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.yandex.mapkit.MapKitFactory;
@@ -82,12 +83,7 @@ public class FragmentIntro extends BaseFragment {
                 JsonObject jo = JsonParser.parseString(data).getAsJsonObject();
                 GsonBuilder gb = new GsonBuilder();
                 Gson g = gb.create();
-                ((MainActivity) mActivity).mCarClasses = g.fromJson(jo.get("data").getAsJsonObject(), CarClasses.class);
-                for (int i = 0; i < ((MainActivity) mActivity).mCarClasses.car_classes.size(); i++) {
-                    ((MainActivity) mActivity).mCarClasses.car_classes.get(i).selected = i == 0 ? 1 : 0;
-                    byte[] decodedString = Base64.decode(((MainActivity) mActivity).mCarClasses.car_classes.get(i).image, Base64.DEFAULT);
-                    ((MainActivity) mActivity).mCarClasses.car_classes.get(i)._image = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                }
+                ((MainActivity) mActivity).setCarClasses(jo.get("data").getAsJsonObject());
                 ((MainActivity) mActivity).mPaymentTypes = g.fromJson(jo.get("data").getAsJsonObject(), PaymentTypes.class);
                 if (((MainActivity) mActivity).mPaymentTypes.payment_types.size() > 0) {
                     ((MainActivity) mActivity).mPaymentTypes.payment_types.get(0).selected = true;

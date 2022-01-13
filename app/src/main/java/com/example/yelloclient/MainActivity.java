@@ -3,8 +3,10 @@ package com.example.yelloclient;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Base64;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -15,6 +17,10 @@ import com.example.yelloclient.classes.CarClasses;
 import com.example.yelloclient.classes.Companies;
 import com.example.yelloclient.classes.PaymentTypes;
 import com.example.yelloclient.databinding.ActivityMainBinding;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -127,6 +133,17 @@ public class MainActivity extends BaseActivity {
 
         } else {
             replaceFragment(new FragmentIntro(), FragmentIntro.tag);
+        }
+    }
+
+    public void setCarClasses(JsonObject jo) {
+        GsonBuilder gb = new GsonBuilder();
+        Gson g = gb.create();
+        mCarClasses = g.fromJson(jo, CarClasses.class);
+        for (int i = 0; i < mCarClasses.car_classes.size(); i++) {
+            mCarClasses.car_classes.get(i).selected = i == 0 ? 1 : 0;
+            byte[] decodedString = Base64.decode(mCarClasses.car_classes.get(i).image, Base64.DEFAULT);
+            mCarClasses.car_classes.get(i)._image = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
         }
     }
 }

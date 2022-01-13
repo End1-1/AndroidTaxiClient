@@ -2,8 +2,11 @@ package com.example.yelloclient.classes;
 
 import android.graphics.Bitmap;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.LinkedList;
 import java.util.List;
+
 
 public class CarClass {
     public int class_id;

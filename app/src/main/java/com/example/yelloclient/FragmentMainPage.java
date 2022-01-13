@@ -90,8 +90,11 @@ public class FragmentMainPage extends BaseFragment {
             if (httpReponseCode == -1) {
 
             } else if (httpReponseCode < 300) {
-                JsonObject jo = JsonParser.parseString(data).getAsJsonObject().get("data").getAsJsonObject();
-
+                JsonObject jo = new JsonObject();
+                JsonArray ja = JsonParser.parseString(data).getAsJsonObject().get("data").getAsJsonArray();
+                jo.add("car_classes", ja);
+                ((MainActivity) mActivity).setCarClasses(jo);
+                _b.rvCars.getAdapter().notifyDataSetChanged();
             } else  {
                 JsonObject jo = JsonParser.parseString(data).getAsJsonObject();
             }
@@ -157,7 +160,7 @@ public class FragmentMainPage extends BaseFragment {
     }
 
     private void setLoading(boolean v) {
-        mLoading = true;
+        mLoading = v;
         _b.rvCars.getAdapter().notifyDataSetChanged();
         _b.btnMinimize.setEnabled(!v);
         _b.btnTaxi.setEnabled(!v);

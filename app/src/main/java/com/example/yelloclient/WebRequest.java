@@ -35,6 +35,8 @@ import okio.BufferedSink;
 
 public class WebRequest {
 
+    public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
+
     public enum  HttpMethod {
         GET,
         POST,
@@ -90,7 +92,7 @@ public class WebRequest {
             }
             return form.build();
         } else {
-            return RequestBody.create(mBody.getBytes(StandardCharsets.UTF_8));
+            return RequestBody.create(mBody, JSON);
         }
     }
 
