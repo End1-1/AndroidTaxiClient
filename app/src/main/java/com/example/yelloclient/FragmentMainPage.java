@@ -101,6 +101,20 @@ public class FragmentMainPage extends BaseFragment {
         }
     };
 
+    WebRequest.HttpResponse mOrderNow = new WebRequest.HttpResponse() {
+        @Override
+        public void httpRespone(int httpReponseCode, String data) {
+            setLoading(false);
+            if (httpReponseCode == -1) {
+
+            } else if (httpReponseCode < 300) {
+                JsonObject jo = JsonParser.parseString(data).getAsJsonObject();
+            } else  {
+                JsonObject jo = JsonParser.parseString(data).getAsJsonObject();
+            }
+        }
+    };
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         _b = FragmentMainPageBinding.inflate(getLayoutInflater(), container, false);
@@ -108,7 +122,12 @@ public class FragmentMainPage extends BaseFragment {
         _b.btnMinimize.setOnClickListener(this);
         _b.edtFrom.setOnClickListener(this);
         _b.edtTo.setOnClickListener(this);
+        _b.btnOptions.setOnClickListener(this);
+        _b.btnORDER.setOnClickListener(this);
+        _b.btnPaymentType.setOnClickListener(this);
         _b.rvCars.setAdapter(new CarClassAdapter());
+        _b.edtFrom.setText(Preference.getString("from_title"));
+        _b.edtTo.setText(Preference.getString("to_title"));
         ViewTreeObserver vto = _b.getRoot().getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -156,17 +175,23 @@ public class FragmentMainPage extends BaseFragment {
                 mAddr.launch(intent);
                 break;
             }
+            case R.id.btnORDER: {
+                initOrder();
+                break;
+            }
         }
     }
 
     private void setLoading(boolean v) {
         mLoading = v;
         _b.rvCars.getAdapter().notifyDataSetChanged();
+        _b.rvCars.setEnabled(!v);
         _b.btnMinimize.setEnabled(!v);
         _b.btnTaxi.setEnabled(!v);
         _b.btnORDER.setEnabled(!v);
         _b.btnRent.setEnabled(!v);
         _b.btnOptions.setEnabled(!v);
+        _b.btnPaymentType.setEnabled(!v);
     }
 
     private void initCoin() {
@@ -214,7 +239,7 @@ public class FragmentMainPage extends BaseFragment {
 
         JsonObject jphone = new JsonObject();
         jphone.addProperty("client", Preference.getString("phone"));
-        jphone.addProperty("passanger", "");
+        jphone.addProperty("passenger", "");
         jo.add("phone", jphone);
 
         JsonObject jmeet = new JsonObject();
@@ -229,6 +254,69 @@ public class FragmentMainPage extends BaseFragment {
         jo.addProperty("rent_time", ((MainActivity) mActivity).mRentTime);
 
         WebRequest.create("/app/mobile/init_coin", WebRequest.HttpMethod.POST, mInitCoin)
+                .setBody(jo.toString())
+                .request();
+    }
+
+    public void initOrder() {
+        setLoading(true);
+
+        JsonObject jo = new JsonObject();
+
+        JsonObject jcar = new JsonObject();
+        jcar.addProperty("class", ((MainActivity) mActivity).mCarClasses.getCurrent().class_id);
+        JsonArray jcarOptions = new JsonArray();
+        for (int o: ((MainActivity)  mActivity).mCarOptions) {
+            jcarOptions.add(o);
+        }
+        jcar.add("options", jcarOptions);
+        jcar.addProperty("comments", Preference.getString("driver_comment"));
+        jo.add("car", jcar);
+
+        JsonObject jpayment = new JsonObject();
+        jpayment.addProperty("type", ((MainActivity) mActivity).mPaymentTypes.getCurrent().id);
+        jpayment.addProperty("company", ((MainActivity) mActivity).mPaymentCompany);
+        jo.add("payment", jpayment);
+
+        JsonObject jroute = new JsonObject();
+        JsonArray jfromCoord = new JsonArray();
+        jfromCoord.add(Preference.getFloat("last_lat"));
+        jfromCoord.add(Preference.getFloat("last_lon"));
+        jroute.add("from", jfromCoord);
+        jroute.addProperty("from_address", Preference.getString("from_display"));
+
+        JsonArray jtoCoord = new JsonArray();
+        if (Preference.getFloat("to_lat") > 0.01) {
+            jtoCoord.add(Preference.getFloat("to_lat"));
+            jtoCoord.add(Preference.getFloat("to_lon"));
+        }
+        jroute.add("to", jtoCoord);
+        jroute.addProperty("to_address", Preference.getString("to_display"));
+        jo.add("route", jroute);
+
+        JsonObject jtime = new JsonObject();
+        android.text.format.DateFormat df = new android.text.format.DateFormat();
+        jtime.addProperty("zone", "Asia/Yerevan");
+        jtime.addProperty("create_time", df.format("yyyy-MM-dd HH:mm", Calendar.getInstance().getTime()).toString());
+        jtime.addProperty("time", df.format("yyyy-MM-dd HH:mm", Calendar.getInstance().getTime()).toString());
+        jo.add("time", jtime);
+
+        JsonObject jphone = new JsonObject();
+        jphone.addProperty("client", Preference.getString("phone"));
+        jphone.addProperty("passenger", "");
+        jo.add("phone", jphone);
+
+        JsonObject jmeet = new JsonObject();
+        jmeet.addProperty("is_meet", false);
+        jmeet.addProperty("place_id", "");
+        jmeet.addProperty("place_type", "");
+        jmeet.addProperty("number", "");
+        jmeet.addProperty("text", "");
+        jo.add("meet", jmeet);
+
+        jo.addProperty("is_rent", ((MainActivity) mActivity).mIsRent);
+        jo.addProperty("rent_time", ((MainActivity) mActivity).mRentTime);
+        WebRequest.create("/app/mobile/init_order", WebRequest.HttpMethod.POST, mOrderNow)
                 .setBody(jo.toString())
                 .request();
     }
@@ -303,7 +391,7 @@ public class FragmentMainPage extends BaseFragment {
             public void onBind(int position) {
                 CarClass cc = ((MainActivity) mActivity).mCarClasses.car_classes.get(position);
                 _b.txtCarClass.setText(cc.name);
-                _b.txtPrice.setText(String.format("%.0f", cc.min_price));
+                _b.txtPrice.setText(String.format("%.0f %s", cc.min_price < 0.1 ? cc.coin : cc.min_price, cc.currency));
                 _b.img.setImageBitmap(cc._image);
                 _b.img.setAlpha(cc.selected == 1 ? 1f : 0.2f);
                 _b.gif.setImageDrawable(drawable);
@@ -315,6 +403,9 @@ public class FragmentMainPage extends BaseFragment {
 
             @Override
             public void onClick(View view) {
+                if (mLoading) {
+                    return;
+                }
                 for (int i = 0; i < ((MainActivity) mActivity).mCarClasses.car_classes.size(); i++) {
                     ((MainActivity) mActivity).mCarClasses.car_classes.get(i).selected = 0;
                 }

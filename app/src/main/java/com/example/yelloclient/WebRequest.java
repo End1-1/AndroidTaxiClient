@@ -69,6 +69,11 @@ public class WebRequest {
         setHeader("Accept", "application/json");
     }
 
+    public WebRequest setUrl(String url) {
+        mUrl = url;
+        return this;
+    }
+
     public WebRequest setHeader(String key, String value) {
         mHeader.put(key, value);
         return this;

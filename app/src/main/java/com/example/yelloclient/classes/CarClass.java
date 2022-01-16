@@ -11,6 +11,7 @@ import java.util.List;
 public class CarClass {
     public int class_id;
     public String name;
+    public String currency;
     public double min_price;
     public double coin;
     public String image;

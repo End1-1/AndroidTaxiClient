@@ -5,6 +5,14 @@ import com.yandex.mapkit.MapKitFactory;
 
 public class Config {
 
+    public final int StateNone = 1;
+    public final int State_pending_search = 2;
+    public final int StateDriverAccept = 3;
+    public final int StateDriverOnway = 4;
+    public final int StateDriverOnplace = 5;
+    public final int StateDriverOrderstarted = 6;
+    public final int StateDriverOrderend = 7;
+
     public static String host() {
         return "newyellowtaxi.com";
         //return "192.168.0.21";

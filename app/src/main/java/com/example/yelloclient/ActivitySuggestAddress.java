@@ -5,9 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -16,11 +14,11 @@ import android.widget.ArrayAdapter;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.yelloclient.classes.GeocoderAnswer;
 import com.example.yelloclient.databinding.ActivitySuggestAddressBinding;
 import com.example.yelloclient.databinding.ItemSuggestBinding;
 import com.yandex.mapkit.geometry.BoundingBox;
 import com.yandex.mapkit.geometry.Point;
-import com.yandex.mapkit.search.KeyValuePair;
 import com.yandex.mapkit.search.SearchFactory;
 import com.yandex.mapkit.search.SearchManager;
 import com.yandex.mapkit.search.SearchManagerType;
@@ -30,7 +28,6 @@ import com.yandex.mapkit.search.SuggestSession;
 import com.yandex.mapkit.search.SuggestType;
 import com.yandex.runtime.Error;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +43,9 @@ public class ActivitySuggestAddress extends BaseActivity implements View.OnClick
     private SuggestItem mItemFrom;
     private SuggestItem mItemTo;
     boolean mTextChangedByItemClick = false;
+    private boolean mRequestFromPoint = false;
+    private boolean mRequestToPoint = false;
+    Intent mData = new Intent();
 
 
     private final Point CENTER = new Point(Preference.getFloat("last_lat"), Preference.getFloat("last_lon"));
@@ -66,8 +66,6 @@ public class ActivitySuggestAddress extends BaseActivity implements View.OnClick
         mSuggestSession = mSearchManager.createSuggestSession();
 
         _b = ActivitySuggestAddressBinding.inflate(getLayoutInflater());
-        _b.edtFrom.addTextChangedListener(mTextWatcher);
-        _b.edtTo.addTextChangedListener(mTextWatcher);
         _b.edtFrom.setOnClickListener(this);
         _b.edtTo.setOnClickListener(this);
         _b.btnClearFrom.setOnClickListener(this);
@@ -75,6 +73,10 @@ public class ActivitySuggestAddress extends BaseActivity implements View.OnClick
         _b.imgBack.setOnClickListener(this);
         _b.txtBack.setOnClickListener(this);
         _b.txtReady.setOnClickListener(this);
+        _b.edtFrom.setText(Preference.getString("from_title"));
+        _b.edtTo.setText(Preference.getString("to_title"));
+        _b.edtFrom.addTextChangedListener(mTextWatcher);
+        _b.edtTo.addTextChangedListener(mTextWatcher);
 
         mResultAdapter = new SuggestAdapter(this);
         _b.list.setAdapter(mResultAdapter);
@@ -215,20 +217,80 @@ public class ActivitySuggestAddress extends BaseActivity implements View.OnClick
             case R.id.txtBack:
                 finish();
                 break;
+            case R.id.imgBack:
+                finish();
+                break;
             case R.id.txtReady:
-                Intent data = new Intent();
+
                 if (mItemFrom != null) {
-                    data.putExtra("from_display", mItemFrom.getDisplayText());
-                    data.putExtra("from_title", mItemFrom.getTitle().getText());
-                    data.putExtra("from_subtitle", mItemFrom.getSubtitle().getText());
+                    mData.putExtra("from_display", mItemFrom.getDisplayText());
+                    mData.putExtra("from_title", mItemFrom.getTitle().getText());
+                    mData.putExtra("from_subtitle", mItemFrom.getSubtitle().getText());
+                    mRequestFromPoint = true;
+                } else {
+                    mData.putExtra("from_display", "");
+                    mData.putExtra("from_title", "");
+                    mData.putExtra("from_subtitle", "");
                 }
                 if (mItemTo != null) {
-                    data.putExtra("to_display", mItemTo.getDisplayText());
-                    data.putExtra("to_title", mItemTo.getTitle().getText());
-                    data.putExtra("to_subtitle", mItemTo.getSubtitle().getText());
+                    mData.putExtra("to_display", mItemTo.getDisplayText());
+                    mData.putExtra("to_title", mItemTo.getTitle().getText());
+                    mData.putExtra("to_subtitle", mItemTo.getSubtitle().getText());
+                    mRequestToPoint = true;
+                } else {
+                    mData.putExtra("to_display", "");
+                    mData.putExtra("to_title", "");
+                    mData.putExtra("to_subtitle", "");
                 }
-                setResult(RESULT_OK, data);
+                if (mRequestFromPoint) {
+                    WebRequest.create("", WebRequest.HttpMethod.GET, mFromPoint)
+                            .setUrl(String.format("https://geocode-maps.yandex.ru/1.x/?apikey=%s&format=json&kind=house&geocode=%s&results=1&sco=latlong",
+                                    Config.yandexGeocodeKey(), mData.getStringExtra("from_display")))
+                            .request();
+                    return;
+                }
+                if (!mRequestFromPoint && mRequestToPoint) {
+                    WebRequest.create("", WebRequest.HttpMethod.GET, mToPoint)
+                            .setUrl(String.format("https://geocode-maps.yandex.ru/1.x/?apikey=%s&format=json&kind=house&geocode=%s&results=1&sco=latlong",
+                                    Config.yandexGeocodeKey(), mData.getStringExtra("to_display")))
+                            .request();
+                    return;
+                }
+                setResult(RESULT_OK, mData);
                 finish();
         }
     }
+
+    WebRequest.HttpResponse mFromPoint = new WebRequest.HttpResponse() {
+        @Override
+        public void httpRespone(int httpReponseCode, String data) {
+            GeocoderAnswer ga = new GeocoderAnswer(data);
+            if (ga.isValid) {
+                Preference.setFloat("last_lat", (float) ga.mPoint.getLatitude());
+                Preference.setFloat("last_lon", (float) ga.mPoint.getLongitude());
+                if (mRequestToPoint) {
+                    WebRequest.create("", WebRequest.HttpMethod.GET, mToPoint)
+                            .setUrl(String.format("https://geocode-maps.yandex.ru/1.x/?apikey=%s&format=json&kind=house&geocode=%s&results=1&sco=latlong",
+                                    Config.yandexGeocodeKey(), Preference.getString("to_display")))
+                            .request();
+                } else {
+                    setResult(RESULT_OK, mData);
+                    finish();
+                }
+            }
+        }
+    };
+
+    WebRequest.HttpResponse mToPoint = new WebRequest.HttpResponse() {
+        @Override
+        public void httpRespone(int httpReponseCode, String data) {
+            GeocoderAnswer ga = new GeocoderAnswer(data);
+            if (ga.isValid) {
+                Preference.setFloat("to_lat", (float) ga.mPoint.getLatitude());
+                Preference.setFloat("to_lon", (float) ga.mPoint.getLongitude());
+                setResult(RESULT_OK, mData);
+                finish();
+            }
+        }
+    };
 }
