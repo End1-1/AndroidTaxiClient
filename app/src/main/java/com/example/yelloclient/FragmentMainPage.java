@@ -101,6 +101,13 @@ public class FragmentMainPage extends BaseFragment {
         }
     };
 
+    WebRequest.HttpResponse mCoordToAddress = new WebRequest.HttpResponse() {
+        @Override
+        public void httpRespone(int httpReponseCode, String data) {
+
+        }
+    };
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         _b = FragmentMainPageBinding.inflate(getLayoutInflater(), container, false);
