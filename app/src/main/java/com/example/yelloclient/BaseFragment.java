@@ -5,6 +5,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 public abstract class BaseFragment extends Fragment implements View.OnClickListener {
 
@@ -15,4 +16,12 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
         super.onAttach(context);
         mActivity = (BaseActivity) context;
     }
+
+    protected void replaceFragment(BaseFragment fr) {
+        FragmentTransaction fragmentTransaction = mActivity.getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.llMainContainer, fr, fr.tag());
+        fragmentTransaction.commit();
+    }
+
+    protected abstract String tag();
 }

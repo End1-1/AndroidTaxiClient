@@ -97,8 +97,10 @@ public class ActivitySuggestAddress extends BaseActivity implements View.OnClick
 
         if (getIntent().getExtras().getBoolean("from", true)) {
             _b.edtFrom.requestFocus();
+            mFrom = true;
         } else {
             _b.edtTo.requestFocus();
+            mFrom = false;
         }
 
         _b.edtFrom.setOnTouchListener(new View.OnTouchListener() {
@@ -231,6 +233,8 @@ public class ActivitySuggestAddress extends BaseActivity implements View.OnClick
                     mData.putExtra("from_display", "");
                     mData.putExtra("from_title", "");
                     mData.putExtra("from_subtitle", "");
+                    Preference.setFloat("last_lat", 0);
+                    Preference.setFloat("last_lon", 0);
                 }
                 if (mItemTo != null) {
                     mData.putExtra("to_display", mItemTo.getDisplayText());
@@ -241,6 +245,8 @@ public class ActivitySuggestAddress extends BaseActivity implements View.OnClick
                     mData.putExtra("to_display", "");
                     mData.putExtra("to_title", "");
                     mData.putExtra("to_subtitle", "");
+                    Preference.setFloat("to_lat", 0);
+                    Preference.setFloat("to_lon", 0);
                 }
                 if (mRequestFromPoint) {
                     WebRequest.create("", WebRequest.HttpMethod.GET, mFromPoint)

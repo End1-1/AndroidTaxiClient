@@ -16,7 +16,6 @@ import com.google.gson.JsonParser;
 
 public class FragmentPhoneNumber extends BaseFragment {
 
-    public static String tag = "FragmentPhoneNumber";
     private FragmentPhoneNumberBinding _b;
 
     @Override
@@ -112,4 +111,9 @@ public class FragmentPhoneNumber extends BaseFragment {
             _b.txtMessage.setText(jo.get("message").getAsString());
         }
     };
+
+    @Override
+    protected String tag() {
+        return "FragmentPhoneNumber";
+    }
 }

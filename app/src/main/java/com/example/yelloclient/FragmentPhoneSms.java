@@ -22,8 +22,6 @@ import org.json.JSONObject;
 
 public class FragmentPhoneSms extends BaseFragment {
 
-    public static final String tag = "FragmentPhoneSms";
-
     private FragmentPhoneSmsBinding _b;
 
     @Override
@@ -181,4 +179,9 @@ public class FragmentPhoneSms extends BaseFragment {
             }
         }
     };
+
+    @Override
+    protected String tag() {
+        return "FragmentPhoneSms";
+    }
 }

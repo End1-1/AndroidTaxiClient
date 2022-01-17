@@ -17,6 +17,8 @@ public class GeocoderAnswer {
     public String mHouse;
     public String mName;
     public Point mPoint;
+    public String mTitle;
+    public String mSubTitle;
 
     public GeocoderAnswer(String s) {
         try {

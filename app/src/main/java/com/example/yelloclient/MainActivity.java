@@ -2,6 +2,7 @@ package com.example.yelloclient;
 
 import android.Manifest;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.os.Build;
@@ -55,7 +56,7 @@ public class MainActivity extends BaseActivity {
             }
         }
         if (granted) {
-            replaceFragment(new FragmentIntro(), FragmentIntro.tag);
+            replaceFragment(new FragmentIntro());
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 Dlg.alertDialog(this, R.string.background_location_permission_title, getString(R.string.background_location_permission_message), new DialogInterface() {
@@ -77,6 +78,11 @@ public class MainActivity extends BaseActivity {
                 ActivityCompat.requestPermissions(this, permissions, REQUEST_LOCATION);
             }
         }
+
+        if (!Preference.isMyServiceRunning(TaxiService.class)) {
+            Intent srvIntent = new Intent(this, TaxiService.class);
+            startForegroundService(srvIntent);
+        }
     }
 
     @Override
@@ -90,25 +96,25 @@ public class MainActivity extends BaseActivity {
         super.fragmentCallback(code);
         switch (code) {
             case FC_NAVIGATE_LOGIN:
-                replaceFragment(new FragmentPhoneNumber(), FragmentPhoneNumber.tag);
+                replaceFragment(new FragmentPhoneNumber());
                 break;
             case FC_NAVIGATE_SMS_CODE:
-                replaceFragment(new FragmentPhoneSms(), FragmentPhoneSms.tag);
+                replaceFragment(new FragmentPhoneSms());
                 break;
             case FC_NAVIGATE_INTRO:
-                replaceFragment(new FragmentIntro(), FragmentIntro.tag);
+                replaceFragment(new FragmentIntro());
                 break;
             case FC_NAVIGATE_MAINPAGE:
-                replaceFragment(new FragmentMainPage(), FragmentMainPage.tag);
+                replaceFragment(new FragmentMainPage());
                 break;
             default:
                 break;
         }
     }
 
-    void replaceFragment(Fragment fr, String tag) {
+    void replaceFragment(BaseFragment fr) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fr, fr, tag);
+        fragmentTransaction.replace(R.id.fr, fr, fr.tag());
         fragmentTransaction.commit();
     }
 
@@ -132,7 +138,7 @@ public class MainActivity extends BaseActivity {
             });
 
         } else {
-            replaceFragment(new FragmentIntro(), FragmentIntro.tag);
+            replaceFragment(new FragmentIntro());
         }
     }
 

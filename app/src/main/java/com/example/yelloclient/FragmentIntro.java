@@ -27,8 +27,6 @@ import java.util.Locale;
 
 public class FragmentIntro extends BaseFragment {
 
-    public static final String tag = "FragmentIntro";
-
     private FragmentIntroBinding _b;
 
     @Override
@@ -89,8 +87,7 @@ public class FragmentIntro extends BaseFragment {
                     ((MainActivity) mActivity).mPaymentTypes.payment_types.get(0).selected = true;
                 }
                 ((MainActivity) mActivity).mCompanies = g.fromJson(jo.get("data").getAsJsonObject(), Companies.class);
-                WebRequest.create("/app/mobile/real_state", WebRequest.HttpMethod.GET, mLastState)
-                        .request();
+                mActivity.fragmentCallback(FC_NAVIGATE_MAINPAGE);
             } else if (httpReponseCode == 401) {
                 mActivity.fragmentCallback(FC_NAVIGATE_LOGIN);
             } else {
@@ -99,12 +96,8 @@ public class FragmentIntro extends BaseFragment {
         }
     };
 
-    WebRequest.HttpResponse mLastState = new WebRequest.HttpResponse() {
-        @Override
-        public void httpRespone(int httpReponseCode, String data) {
-            JsonObject jo = JsonParser.parseString(data).getAsJsonObject();
-            Preference.setInt("last_state", jo.get("status").getAsShort());
-            mActivity.fragmentCallback(FC_NAVIGATE_MAINPAGE);
-        }
-    };
+    @Override
+    protected String tag() {
+        return "FragmentIntro";
+    }
 }

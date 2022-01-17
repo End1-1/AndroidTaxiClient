@@ -47,9 +47,14 @@ public class WebRequest {
         void httpRespone(int httpReponseCode, String data);
     }
 
+    public interface HttpPostLoad {
+        void post();
+    }
+
     private String mUrl;
     private HttpMethod mMethod;
     private HttpResponse mWebResponse;
+    private HttpPostLoad mPostLoad;
     private Map<String, String> mHeader;
     private Map<String, String> mParameters;
     private String mBody = "";
@@ -67,6 +72,11 @@ public class WebRequest {
 
         setHeader("Authorization", "Bearer " + Config.bearerKey());
         setHeader("Accept", "application/json");
+    }
+
+    public WebRequest setPostLoad(HttpPostLoad postLoad) {
+        mPostLoad = postLoad;
+        return this;
     }
 
     public WebRequest setUrl(String url) {
@@ -144,6 +154,9 @@ public class WebRequest {
                 public void run() {
                     if (mWebResponse != null) {
                         mWebResponse.httpRespone(mHttpResponseCode, mOutputData);
+                    }
+                    if (mPostLoad != null) {
+                        mPostLoad.post();
                     }
                 }
             });

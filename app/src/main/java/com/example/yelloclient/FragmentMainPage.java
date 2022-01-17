@@ -1,8 +1,7 @@
 package com.example.yelloclient;
 
-import static com.example.yelloclient.BaseActivity.FC_NAVIGATE_INTRO;
-
-import android.animation.ObjectAnimator;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -10,27 +9,31 @@ import android.graphics.BitmapFactory;
 import android.graphics.ImageDecoder;
 import android.graphics.drawable.AnimatedImageDrawable;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.webkit.WebResourceError;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.yelloclient.classes.CarClass;
+import com.example.yelloclient.classes.GeocoderAnswer;
 import com.example.yelloclient.databinding.FragmentMainPageBinding;
 import com.example.yelloclient.databinding.ItemCarsBinding;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.yandex.mapkit.Animation;
 import com.yandex.mapkit.MapKitFactory;
 import com.yandex.mapkit.geometry.Point;
 import com.yandex.mapkit.map.CameraListener;
@@ -42,14 +45,13 @@ import com.yandex.runtime.image.ImageProvider;
 
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.Date;
 
 public class FragmentMainPage extends BaseFragment {
 
-    public static final String tag = "FragmentMainPage";
-
     private FragmentMainPageBinding _b;
     private boolean mLoading = false;
+    private boolean mCoordGeocoding = false;
+    private boolean mMainFrameDown = false;
 
     public FragmentMainPage() {
         mAddr = registerForActivityResult(
@@ -77,18 +79,59 @@ public class FragmentMainPage extends BaseFragment {
                                 Preference.setString("to_display", "");
                                 _b.edtTo.setText("");
                             }
-                            initCoin();
+                            initCoin(null);
                         }
                     }
                 });
     }
+
+    WebRequest.HttpResponse mBroadcastAuth = new WebRequest.HttpResponse() {
+        @Override
+        public void httpRespone(int httpReponseCode, String data) {
+            Intent intent = new Intent("msg");
+            intent.putExtra("action", Config.ACTION_OPEN_WEBSOCKET);
+            LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
+        }
+    };
+
+    WebRequest.HttpResponse mLastState = new WebRequest.HttpResponse() {
+        @Override
+        public void httpRespone(int httpReponseCode, String data) {
+            if (httpReponseCode == -1) {
+                Dlg.alertDialog(getContext(), R.string.Error, R.string.InternetFail);
+            } else if (httpReponseCode < 300) {
+                WebRequest.create("/app/mobile/broadcasting/auth", WebRequest.HttpMethod.POST, mBroadcastAuth)
+                        .setParameter("channel_name", Config.channelName())
+                        .setParameter("socket_id", Config.socketId())
+                        .request();
+                JsonObject jo = JsonParser.parseString(data).getAsJsonObject();
+                switch (jo.get("status").getAsShort()) {
+                    case Config.StateNone:
+                        mCoordGeocoding = true;
+                        WebRequest.create("", WebRequest.HttpMethod.GET, mCoordToAddress)
+                                .setUrl(String.format("https://geocode-maps.yandex.ru/1.x/?apikey=%s&format=json&kind=house&geocode=%f,%f&results=1&sco=latlong",
+                                        Config.yandexGeocodeKey(), Preference.getFloat("last_lat"), Preference.getFloat("last_lon")))
+                                .request();
+                        break;
+                    case Config.StatePendingSearch:
+                        //replaceFragment(new FragmentSearchTaxi());
+                        _b.llMainContainer.removeAllViews();
+                        replaceFragment(new FragmentSearchTaxi());
+                        break;
+                }
+                Preference.setInt("last_state", jo.get("status").getAsShort());
+            } else {
+
+            }
+        }
+    };
 
     WebRequest.HttpResponse mInitCoin = new WebRequest.HttpResponse() {
         @Override
         public void httpRespone(int httpReponseCode, String data) {
             setLoading(false);
             if (httpReponseCode == -1) {
-
+                Dlg.alertDialog(getContext(), R.string.Error, R.string.InternetFail);
             } else if (httpReponseCode < 300) {
                 JsonObject jo = new JsonObject();
                 JsonArray ja = JsonParser.parseString(data).getAsJsonObject().get("data").getAsJsonArray();
@@ -101,12 +144,42 @@ public class FragmentMainPage extends BaseFragment {
         }
     };
 
-<<<<<<< HEAD
     WebRequest.HttpResponse mCoordToAddress = new WebRequest.HttpResponse() {
         @Override
         public void httpRespone(int httpReponseCode, String data) {
+            mCoordGeocoding = false;
+            if (httpReponseCode == -1) {
+                Dlg.alertDialog(getContext(), R.string.Error, R.string.InternetFail);
+            } else if (httpReponseCode < 300) {
+                if (Preference.getFloat("camera_lat") > 0.01) {
+                    mCoordGeocoding = true;
+                    WebRequest wr = WebRequest.create("", WebRequest.HttpMethod.GET, mCoordToAddress)
+                            .setUrl(String.format("https://geocode-maps.yandex.ru/1.x/?apikey=%s&format=json&kind=house&geocode=%f,%f&results=1&sco=latlong",
+                                    Config.yandexGeocodeKey(), Preference.getFloat("camera_lat"), Preference.getFloat("camera_lon")));
+                    Preference.setFloat("camera_lat", 0);
+                    Preference.setFloat("camera_lon", 0);
+                    wr.request();
+                    return;
+                }
+                GeocoderAnswer ga = new GeocoderAnswer(data);
+                if (ga.isValid) {
+                    Preference.setString("from_display", ga.mAddressLine);
+                    Preference.setString("from_title", ga.mStreet + (ga.mHouse.isEmpty() ? "" : ", " + ga.mHouse));
+                    Preference.setString("from_subtitle", "");
+                    Preference.setFloat("last_lat", (float) ga.mPoint.getLatitude());
+                    Preference.setFloat("last_lon", (float) ga.mPoint.getLongitude());
+                    _b.edtFrom.setText(ga.mStreet + (ga.mHouse.isEmpty() ? "" : ", " + ga.mHouse));
+                    setLoading(true);
+                    initCoin(null);
+                } else {
 
-=======
+                }
+            } else  {
+                JsonObject jo = JsonParser.parseString(data).getAsJsonObject();
+            }
+        }
+    };
+
     WebRequest.HttpResponse mOrderNow = new WebRequest.HttpResponse() {
         @Override
         public void httpRespone(int httpReponseCode, String data) {
@@ -115,10 +188,11 @@ public class FragmentMainPage extends BaseFragment {
 
             } else if (httpReponseCode < 300) {
                 JsonObject jo = JsonParser.parseString(data).getAsJsonObject();
+                _b.llMainContainer.removeAllViews();
+                replaceFragment(new FragmentSearchTaxi());
             } else  {
                 JsonObject jo = JsonParser.parseString(data).getAsJsonObject();
             }
->>>>>>> 8ef7380bc87588e2e2c9592287f8847b85a062db
         }
     };
 
@@ -132,6 +206,7 @@ public class FragmentMainPage extends BaseFragment {
         _b.btnOptions.setOnClickListener(this);
         _b.btnORDER.setOnClickListener(this);
         _b.btnPaymentType.setOnClickListener(this);
+        _b.btnMyPos.setOnClickListener(this);
         _b.rvCars.setAdapter(new CarClassAdapter());
         _b.edtFrom.setText(Preference.getString("from_title"));
         _b.edtTo.setText(Preference.getString("to_title"));
@@ -140,7 +215,7 @@ public class FragmentMainPage extends BaseFragment {
             @Override
             public void onGlobalLayout() {
                 _b.getRoot().getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                _b.mapview.setTop(_b.mapview.getTop() - 100);
+                //_b.mapview.setTop(-80);
             }
         });
         return _b.getRoot();
@@ -154,6 +229,9 @@ public class FragmentMainPage extends BaseFragment {
         _b.mapview.getMap().move(new CameraPosition(new Point(Preference.getFloat("last_lat"), Preference.getFloat("last_lon")), 16,0, 0));
         mPlaceMark = _b.mapview.getMap().getMapObjects().addPlacemark(new Point(Preference.getFloat("last_lat"), Preference.getFloat("last_lon")), mPlaceMarkImage);
         _b.mapview.getMap().addCameraListener(mCameraListener);
+
+        WebRequest.create("/app/mobile/real_state", WebRequest.HttpMethod.GET, mLastState)
+                .request();
     }
 
     @Override
@@ -183,9 +261,12 @@ public class FragmentMainPage extends BaseFragment {
                 break;
             }
             case R.id.btnORDER: {
-                initOrder();
+                initCoin(() -> initOrder());
                 break;
             }
+            case R.id.btnMyPos:
+                LocationService.getSingleLocation(mLocationListener);
+                break;
         }
     }
 
@@ -201,7 +282,7 @@ public class FragmentMainPage extends BaseFragment {
         _b.btnPaymentType.setEnabled(!v);
     }
 
-    private void initCoin() {
+    private void initCoin(WebRequest.HttpPostLoad post) {
         setLoading(true);
 
         JsonObject jo = new JsonObject();
@@ -261,6 +342,7 @@ public class FragmentMainPage extends BaseFragment {
         jo.addProperty("rent_time", ((MainActivity) mActivity).mRentTime);
 
         WebRequest.create("/app/mobile/init_coin", WebRequest.HttpMethod.POST, mInitCoin)
+                .setPostLoad(post)
                 .setBody(jo.toString())
                 .request();
     }
@@ -347,26 +429,37 @@ public class FragmentMainPage extends BaseFragment {
         @Override
         public void onCameraPositionChanged(@NonNull Map map, @NonNull CameraPosition cameraPosition, @NonNull CameraUpdateReason cameraUpdateReason, boolean b) {
             mPlaceMark.setGeometry(cameraPosition.getTarget());
+
+            if (mCoordGeocoding) {
+                Preference.setFloat("camera_lat", (float) cameraPosition.getTarget().getLatitude());
+                Preference.setFloat("camera_lon", (float) cameraPosition.getTarget().getLongitude());
+            } else {
+                mCoordGeocoding = true;
+                WebRequest.create("", WebRequest.HttpMethod.GET, mCoordToAddress)
+                        .setUrl(String.format("https://geocode-maps.yandex.ru/1.x/?apikey=%s&format=json&kind=house&geocode=%f,%f&results=1&sco=latlong",
+                                Config.yandexGeocodeKey(), cameraPosition.getTarget().getLatitude(), cameraPosition.getTarget().getLongitude()))
+                        .request();
+            }
         }
     };
 
     public void showHideFragment() {
-        ObjectAnimator animation = ObjectAnimator.ofFloat(_b.fr, "translationY", 100f);
-        animation.setDuration(2000);
-        animation.start();
+        int top = mMainFrameDown  ? 0 : _b.getRoot().getMeasuredHeight() - _b.llMainContainer.getMeasuredHeight() - _b.llCont2.getMeasuredHeight() - _b.btnMyPos.getMeasuredHeight();
+        _b.fr.animate().translationY(top).setDuration(500)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        _b.fr.animate().setListener(null);
+                        mMainFrameDown = !mMainFrameDown;
+                    }
+                })
+                .start();
+    }
 
-//        ValueAnimator anim = ValueAnimator.ofInt(_b.fr.getMeasuredHeight(), -500);
-//        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//            @Override
-//            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-//                int val = (Integer) valueAnimator.getAnimatedValue();
-//                ViewGroup.LayoutParams layoutParams = _b.fr.getLayoutParams();
-//                layoutParams.height = val;
-//                _b.fr.setLayoutParams(layoutParams);
-//            }
-//        });
-//        anim.setDuration(1500);
-//        anim.start();
+    @Override
+    protected String tag() {
+        return "FragmentMainPage";
     }
 
     class CarClassAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -439,5 +532,16 @@ public class FragmentMainPage extends BaseFragment {
         }
     }
 
+    LocationService.LocationChangeListener mLocationListener = new LocationService.LocationChangeListener() {
+        @Override
+        public void location(Location l) {
+            _b.mapview.getMap().move(new CameraPosition(new Point(l.getLatitude(), l.getLongitude()), 16, 0, 0), new Animation(Animation.Type.SMOOTH, 1), null);
+        }
+    };
+
     ActivityResultLauncher<Intent> mAddr;
+
+    public void reset() {
+        ((MainActivity) mActivity).fragmentCallback(BaseActivity.FC_NAVIGATE_MAINPAGE);
+    };
 }

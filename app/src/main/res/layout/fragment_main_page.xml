@@ -5,12 +5,31 @@
     android:id="@+id/llContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@null"
     android:orientation="vertical">
 
-    <com.yandex.mapkit.mapview.MapView
-        android:id="@+id/mapview"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <com.yandex.mapkit.mapview.MapView
+            android:id="@+id/mapview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@+id/mapstair"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/mapstair"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/fr"
@@ -20,13 +39,30 @@
         android:gravity="center_horizontal">
 
         <LinearLayout
+            android:id="@+id/llMainContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
+            app:layout_constraintStart_toStartOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/btnMyPos"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginRight="10dp"
+                    android:src="@drawable/picklocation"
+                    tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
+
+            </LinearLayout>
 
             <Button
                 android:id="@+id/btnMinimize"
@@ -43,18 +79,18 @@
 
                 <LinearLayout
                     android:id="@+id/llOrderButton"
-                    android:paddingRight="10dp"
-                    android:paddingLeft="10dp"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingLeft="10dp"
+                    android:paddingTop="5dp"
+                    android:paddingRight="10dp"
+                    android:paddingBottom="5dp">
 
                     <Button
                         android:id="@+id/btnTaxi"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="60dp"
                         android:layout_marginRight="5dp"
                         android:layout_weight="1"
                         android:text="@string/ORDERTAXI" />
@@ -62,7 +98,7 @@
                     <Button
                         android:id="@+id/btnRent"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="60dp"
                         android:layout_weight="1"
                         android:text="@string/RENTTAXI" />
                 </LinearLayout>
@@ -78,11 +114,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:paddingRight="10dp"
+                    android:orientation="horizontal"
                     android:paddingLeft="10dp"
                     android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
-                    android:orientation="horizontal">
+                    android:paddingRight="10dp"
+                    android:paddingBottom="10dp">
 
                     <ImageView
                         android:id="@+id/imageView3"
@@ -94,15 +130,17 @@
                         android:id="@+id/edtFrom"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
                         android:layout_weight="1"
+                        android:background="@null"
+                        android:backgroundTint="@null"
+                        android:clickable="true"
                         android:ems="10"
                         android:focusable="false"
                         android:hint="@string/From"
                         android:inputType="text"
-                        android:clickable="true"
-                        android:textColorHint="@color/light_gray"
-                        android:background="@null"
-                        android:backgroundTint="@null"/>
+                        android:textColorHint="@color/light_gray" />
 
                     <ImageButton
                         android:id="@+id/btnMapFrom"
@@ -121,14 +159,14 @@
 
                 <LinearLayout
                     android:id="@+id/llTo"
-                    android:paddingRight="10dp"
-                    android:paddingLeft="10dp"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingLeft="10dp"
+                    android:paddingTop="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingBottom="10dp">
 
                     <ImageView
                         android:id="@+id/imgTo"
@@ -140,15 +178,17 @@
                         android:id="@+id/edtTo"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
                         android:layout_weight="1"
+                        android:background="@null"
+                        android:backgroundTint="@null"
+                        android:clickable="true"
                         android:ems="10"
                         android:focusable="false"
                         android:hint="@string/To"
                         android:inputType="text"
-                        android:clickable="true"
-                        android:textColorHint="@color/light_gray"
-                        android:background="@null"
-                        android:backgroundTint="@null" />
+                        android:textColorHint="@color/light_gray" />
 
                     <ImageButton
                         android:id="@+id/btnMapto"
@@ -156,7 +196,9 @@
                         android:layout_height="30dp"
                         android:background="@null"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/placeholder" />
+                        android:src="@drawable/placeholder"
+
+                        tools:ignore="SpeakableTextPresentCheck" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -165,32 +207,32 @@
                 android:id="@+id/view4"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/light_gray"/>
+                android:background="@color/light_gray" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvCars"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:background="@color/white"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
             <View
                 android:id="@+id/view5"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/light_gray"/>
+                android:background="@color/light_gray" />
 
             <LinearLayout
                 android:id="@+id/llOptions"
-                android:paddingRight="10dp"
-                android:paddingLeft="10dp"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
-                android:background="@color/white"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:background="@color/white"
+                android:orientation="horizontal"
+                android:paddingLeft="10dp"
+                android:paddingTop="5dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="5dp">
 
                 <Button
                     android:id="@+id/btnOptions"
@@ -214,36 +256,36 @@
                 android:layout_height="1dp"
                 android:background="@color/light_gray" />
 
-        <LinearLayout
-            android:id="@+id/llOrder"
-            android:paddingRight="20dp"
-            android:paddingLeft="10dp"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
-            android:background="@color/white"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btnORDER"
+            <LinearLayout
+                android:id="@+id/llOrder"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_weight="1"
-                android:layout_marginRight="10dp"
-                android:text="@string/ORDER" />
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingLeft="10dp"
+                android:paddingTop="5dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="5dp">
 
-            <ImageButton
-                android:id="@+id/btnCalendar"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/calendar"
-                android:scaleType="centerInside"
-                android:background="@null"
-                android:text="@string/Cash" />
+                <Button
+                    android:id="@+id/btnORDER"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1"
+                    android:text="@string/ORDER" />
 
-        </LinearLayout>
+                <ImageButton
+                    android:id="@+id/btnCalendar"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@null"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/calendar"
+                    android:text="@string/Cash" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
