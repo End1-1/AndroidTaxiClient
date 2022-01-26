@@ -37,6 +37,7 @@ public class MainActivity extends BaseActivity {
     public Companies mCompanies;
     public boolean mIsRent = false;
     public Integer mRentTime = 0;
+    public Integer mCurrentCarClass = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,9 +148,20 @@ public class MainActivity extends BaseActivity {
         Gson g = gb.create();
         mCarClasses = g.fromJson(jo, CarClasses.class);
         for (int i = 0; i < mCarClasses.car_classes.size(); i++) {
-            mCarClasses.car_classes.get(i).selected = i == 0 ? 1 : 0;
+            if (mCurrentCarClass == 0) {
+                mCarClasses.car_classes.get(i).selected = i == 0 ? 1 : 0;
+            } else if (mCurrentCarClass == mCarClasses.car_classes.get(i).class_id) {
+                mCarClasses.car_classes.get(i).selected = 1;
+            } else {
+                mCarClasses.car_classes.get(i).selected = 0;
+            }
             byte[] decodedString = Base64.decode(mCarClasses.car_classes.get(i).image, Base64.DEFAULT);
             mCarClasses.car_classes.get(i)._image = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        }
+        if (mCarClasses.getCurrent() == null) {
+            if (mCarClasses.car_classes.size() > 0) {
+                mCarClasses.car_classes.get(0).selected = 1;
+            }
         }
     }
 }

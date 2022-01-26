@@ -43,7 +43,12 @@ public class Config {
     }
 
     public static String channelName() {
-        return String.format("private-client-api-base.%d.%s", Preference.getInt("client_id"),  Preference.getString("phone").replace("+", ""));
+        return String.format("private-client-api-base.%d.%s", Preference.getInt("client_id"),
+                Preference.getString("phone")
+                        .replace("+", "")
+                        .replace("-", "")
+                        .replace(")", "")
+                        .replace("(", ""));
     }
 
     public static String socketId() {

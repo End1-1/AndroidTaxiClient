@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.yelloclient.classes.CarClass;
 import com.example.yelloclient.classes.GeocoderAnswer;
+import com.example.yelloclient.classes.Messanger;
 import com.example.yelloclient.databinding.FragmentMainPageBinding;
 import com.example.yelloclient.databinding.ItemCarsBinding;
 import com.google.gson.JsonArray;
@@ -88,9 +89,9 @@ public class FragmentMainPage extends BaseFragment {
     WebRequest.HttpResponse mBroadcastAuth = new WebRequest.HttpResponse() {
         @Override
         public void httpRespone(int httpReponseCode, String data) {
-            Intent intent = new Intent("msg");
-            intent.putExtra("action", Config.ACTION_OPEN_WEBSOCKET);
-            LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
+            Messanger.create(Messanger.MSG_SOCKET_CONNECTION)
+                    .putExtra("openconnection", true)
+                    .broadcast();
         }
     };
 
@@ -287,8 +288,9 @@ public class FragmentMainPage extends BaseFragment {
 
         JsonObject jo = new JsonObject();
 
+        ((MainActivity) mActivity).mCurrentCarClass  = ((MainActivity) mActivity).mCarClasses.getCurrent().class_id;
         JsonObject jcar = new JsonObject();
-        jcar.addProperty("class", ((MainActivity) mActivity).mCarClasses.getCurrent().class_id);
+        jcar.addProperty("class", ((MainActivity) mActivity).mCurrentCarClass);
         JsonArray jcarOptions = new JsonArray();
         for (int o: ((MainActivity)  mActivity).mCarOptions) {
             jcarOptions.add(o);

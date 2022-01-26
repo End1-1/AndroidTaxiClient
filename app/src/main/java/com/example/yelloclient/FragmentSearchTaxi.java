@@ -42,8 +42,8 @@ public class FragmentSearchTaxi extends BaseFragment {
     WebRequest.HttpResponse mCancelSearch = new WebRequest.HttpResponse() {
         @Override
         public void httpRespone(int httpReponseCode, String data) {
-            _b.btnCancelSearch.setEnabled(true);
             if (httpReponseCode == -1) {
+                _b.btnCancelSearch.setEnabled(true);
                 Dlg.alertDialog(getContext(), R.string.Error, R.string.InternetFail);
             } else if (httpReponseCode < 300) {
                 getParentFragmentManager().getFragments().get(0);
@@ -52,7 +52,7 @@ public class FragmentSearchTaxi extends BaseFragment {
                     fmp.reset();
                 }
             } else {
-
+                _b.btnCancelSearch.setEnabled(true);
             }
         }
     };
