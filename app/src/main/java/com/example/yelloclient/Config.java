@@ -18,8 +18,8 @@ public class Config {
     public static final int ACTION_OPEN_WEBSOCKET = 1;
 
     public static String host() {
-        //return "newyellowtaxi.com";
-        return "192.168.0.111";
+        return "newyellowtaxi.com";
+        //return "192.168.0.111";
     }
 
     public static String bearerKey() {

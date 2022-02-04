@@ -216,6 +216,8 @@ public class FragmentMainPage extends BaseFragment {
         _b.edtTo.setText(Preference.getString("to_title"));
         _b.btnMapFrom.setOnClickListener(this);
         _b.btnMapto.setOnClickListener(this);
+        _b.btnTaxi.setOnClickListener(this);
+        _b.btnRent.setOnClickListener(this);
         ViewTreeObserver vto = _b.getRoot().getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -224,27 +226,31 @@ public class FragmentMainPage extends BaseFragment {
                 //_b.mapview.setTop(-80);
             }
         });
-        _b.llMainContainer.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    _b.fr.animate().y(0).setDuration(0).start();
-                    return true;
-                }
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    cx = event.getX() - event.getRawX();
-                    cy = event.getY() - event.getRawY();
-                    return true;
-                }
-                if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                    _b.fr.animate().y(event.getRawY() + cy).setDuration(0).start();
-                    return true;
-                }
-                return false;
-            }
-        });
+
+        _b.llMainContainer.setOnTouchListener(mTouchListener);
+        //_b.btnTaxi.setOnTouchListener(mTouchListener);
         return _b.getRoot();
     }
+
+    View.OnTouchListener mTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                _b.fr.animate().y(0).setDuration(0).start();
+                return true;
+            }
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                cx = event.getX() - event.getRawX();
+                cy = event.getY() - event.getRawY();
+                return true;
+            }
+            if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                _b.fr.animate().y(event.getRawY() + cy).setDuration(0).start();
+                return true;
+            }
+            return false;
+        }
+    };
 
     @Override
     public void onStart() {
@@ -288,6 +294,14 @@ public class FragmentMainPage extends BaseFragment {
                 initCoin(() -> initOrder());
                 break;
             }
+            case R.id.btnTaxi:
+                _b.btnTaxi.setBackground(getContext().getDrawable(R.drawable.btn_transparent1selected));
+                _b.btnRent.setBackground(getContext().getDrawable(R.drawable.btn_transparent1));
+                break;
+            case R.id.btnRent:
+                _b.btnRent.setBackground(getContext().getDrawable(R.drawable.btn_transparent1selected));
+                _b.btnTaxi.setBackground(getContext().getDrawable(R.drawable.btn_transparent1));
+                break;
             case R.id.btnMyPos:
                 LocationService.getSingleLocation(mLocationListener);
                 break;

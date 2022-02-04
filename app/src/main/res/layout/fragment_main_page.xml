@@ -93,6 +93,7 @@
                         android:layout_height="60dp"
                         android:layout_marginRight="5dp"
                         android:layout_weight="1"
+                        style="@style/YTransparentButton1Selected"
                         android:text="@string/ORDERTAXI" />
 
                     <Button
@@ -100,6 +101,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="60dp"
                         android:layout_weight="1"
+                        style="@style/YTransparentButton1"
                         android:text="@string/RENTTAXI" />
                 </LinearLayout>
 
@@ -133,15 +135,11 @@
                         android:layout_marginLeft="5dp"
                         android:layout_marginRight="5dp"
                         android:layout_weight="1"
-                        android:background="@null"
-                        android:backgroundTint="@null"
                         android:clickable="true"
                         android:ems="10"
                         android:focusable="false"
                         android:hint="@string/From"
-                        android:inputType="text"
-                        android:textColorHint="@color/light_gray"
-                        android:textSize="16dp"/>
+                        android:inputType="text"/>
 
                     <LinearLayout
                         android:id="@+id/btnMapFrom"
@@ -187,15 +185,11 @@
                         android:layout_marginLeft="5dp"
                         android:layout_marginRight="5dp"
                         android:layout_weight="1"
-                        android:background="@null"
-                        android:backgroundTint="@null"
                         android:clickable="true"
                         android:ems="10"
                         android:focusable="false"
                         android:hint="@string/To"
-                        android:inputType="text"
-                        android:textSize="16dp"
-                        android:textColorHint="@color/light_gray" />
+                        android:inputType="text" />
 
                     <LinearLayout
                         android:id="@+id/btnMapto"
@@ -252,12 +246,14 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="5dp"
                     android:layout_weight="1"
+                    style="@style/YTransparentButton1"
                     android:text="@string/Options" />
 
                 <Button
                     android:id="@+id/btnPaymentType"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    style="@style/YTransparentButton1"
                     android:layout_weight="1"
                     android:text="@string/Cash" />
             </LinearLayout>
@@ -286,7 +282,6 @@
                     android:layout_height="60dp"
                     android:layout_marginRight="10dp"
                     android:layout_weight="1"
-                    android:background="@drawable/btn_real_yellow"
                     android:text="@string/ORDER" />
 
                 <ImageButton

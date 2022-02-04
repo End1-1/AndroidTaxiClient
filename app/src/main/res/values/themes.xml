@@ -14,9 +14,35 @@
 
         <!-- Customize your theme here. -->
         <item name="android:windowBackground">@color/white</item>
-        <item name=""
-        <item name="android:textColor">@color/gray</item>
-        <item name="android:textSize">16sp</item>
+        <item name="buttonStyle">@style/YButton</item>
+        <item name="editTextStyle">@style/YEditTextStyle</item>
 
     </style>
+
+    <style name="YButton" parent="@style/Widget.AppCompat.Button">
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:background">@drawable/btn_yellow</item>
+    </style>
+
+    <style name="YTransparentButton1" parent="@style/YButton">
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:background">@drawable/btn_transparent1</item>
+    </style>
+
+    <style name="YTransparentButton1Selected" parent="@style/YButton">
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:background">@drawable/btn_transparent1selected</item>
+    </style>
+
+    <style name="YEditTextStyle" parent="@style/Widget.AppCompat.EditText">
+        <item name="android:textColor">#808080</item>
+        <item name="android:layout_height">45dip</item>
+        <item name="android:textColorHint">@color/light_gray</item>
+        <item name="android:background">@null</item>
+        <item name="backgroundTint">@null</item>
+    </style>
+
 </resources>

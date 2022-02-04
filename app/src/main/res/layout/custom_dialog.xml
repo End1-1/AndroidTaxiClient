@@ -58,7 +58,7 @@
             android:layout_margin="10dp"
             android:layout_weight="1"
             android:layout_marginRight="32dp"
-            android:background="@drawable/btn_yellow"
+            android:background="@drawable/btn_gray"
             android:text="@string/NO"
             android:textColor="@color/white" />
     </LinearLayout>
