@@ -3,22 +3,17 @@ package com.example.yelloclient;
 import static com.example.yelloclient.BaseActivity.FC_NAVIGATE_LOGIN;
 import static com.example.yelloclient.BaseActivity.FC_NAVIGATE_MAINPAGE;
 
-import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Bundle;
-
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.yelloclient.classes.CarClasses;
 import com.example.yelloclient.classes.Companies;
 import com.example.yelloclient.classes.PaymentTypes;
 import com.example.yelloclient.databinding.FragmentIntroBinding;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.yandex.mapkit.MapKitFactory;

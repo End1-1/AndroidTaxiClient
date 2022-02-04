@@ -24,6 +24,7 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -275,6 +276,10 @@ public class FragmentMainPage extends BaseFragment {
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.btnOptions:
+                _b.llMainContainer.removeAllViews();
+                replaceFragment(new FragmentTaxiOptions());
+                break;
             case R.id.btnMinimize:
                 showHideFragment();
                 break;
@@ -509,7 +514,7 @@ public class FragmentMainPage extends BaseFragment {
 
         private Drawable drawable;
         public CarClassAdapter() {
-            ImageDecoder.Source source = null;
+            ImageDecoder.Source source;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
                 source = ImageDecoder.createSource(getResources(), R.drawable.load1);
                 try {
@@ -518,7 +523,7 @@ public class FragmentMainPage extends BaseFragment {
                     e.printStackTrace();
                 }
             } else {
-                drawable = getContext().getDrawable(R.drawable.load1);
+                drawable = AppCompatResources.getDrawable(getContext(), R.drawable.load1);
             }
         }
 
@@ -586,5 +591,5 @@ public class FragmentMainPage extends BaseFragment {
 
     public void reset() {
         ((MainActivity) mActivity).fragmentCallback(BaseActivity.FC_NAVIGATE_MAINPAGE);
-    };
+    }
 }
