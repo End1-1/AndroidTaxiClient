@@ -122,8 +122,8 @@
 
                     <ImageView
                         android:id="@+id/imageView3"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
                         android:src="@drawable/od_red" />
 
                     <EditText
@@ -140,15 +140,21 @@
                         android:focusable="false"
                         android:hint="@string/From"
                         android:inputType="text"
-                        android:textColorHint="@color/light_gray" />
+                        android:textColorHint="@color/light_gray"
+                        android:textSize="16dp"/>
 
-                    <ImageButton
+                    <LinearLayout
                         android:id="@+id/btnMapFrom"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:background="@null"
-                        android:scaleType="fitCenter"
-                        android:src="@drawable/placeholder" />
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:gravity="center">
+                        <ImageButton
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:background="@null"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/placeholder" />
+                    </LinearLayout>
                 </LinearLayout>
 
                 <View
@@ -170,8 +176,8 @@
 
                     <ImageView
                         android:id="@+id/imgTo"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
                         android:src="@drawable/black_circle" />
 
                     <EditText
@@ -188,17 +194,23 @@
                         android:focusable="false"
                         android:hint="@string/To"
                         android:inputType="text"
+                        android:textSize="16dp"
                         android:textColorHint="@color/light_gray" />
 
-                    <ImageButton
+                    <LinearLayout
                         android:id="@+id/btnMapto"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:background="@null"
-                        android:scaleType="fitCenter"
-                        android:src="@drawable/placeholder"
+                        android:gravity="center"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp">
+                        <ImageButton
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:background="@null"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/placeholder"
+                            tools:ignore="SpeakableTextPresentCheck" />
+                    </LinearLayout>
 
-                        tools:ignore="SpeakableTextPresentCheck" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -274,6 +286,7 @@
                     android:layout_height="60dp"
                     android:layout_marginRight="10dp"
                     android:layout_weight="1"
+                    android:background="@drawable/btn_real_yellow"
                     android:text="@string/ORDER" />
 
                 <ImageButton

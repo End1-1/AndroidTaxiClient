@@ -13,6 +13,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -53,6 +54,8 @@ public class FragmentMainPage extends BaseFragment {
     private boolean mLoading = false;
     private boolean mCoordGeocoding = false;
     private boolean mMainFrameDown = false;
+    private float cx = 0;
+    private float cy = 0;
 
     public FragmentMainPage() {
         mAddr = registerForActivityResult(
@@ -211,12 +214,33 @@ public class FragmentMainPage extends BaseFragment {
         _b.rvCars.setAdapter(new CarClassAdapter());
         _b.edtFrom.setText(Preference.getString("from_title"));
         _b.edtTo.setText(Preference.getString("to_title"));
+        _b.btnMapFrom.setOnClickListener(this);
+        _b.btnMapto.setOnClickListener(this);
         ViewTreeObserver vto = _b.getRoot().getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
                 _b.getRoot().getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 //_b.mapview.setTop(-80);
+            }
+        });
+        _b.llMainContainer.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    _b.fr.animate().y(0).setDuration(0).start();
+                    return true;
+                }
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    cx = event.getX() - event.getRawX();
+                    cy = event.getY() - event.getRawY();
+                    return true;
+                }
+                if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                    _b.fr.animate().y(event.getRawY() + cy).setDuration(0).start();
+                    return true;
+                }
+                return false;
             }
         });
         return _b.getRoot();
@@ -230,7 +254,6 @@ public class FragmentMainPage extends BaseFragment {
         _b.mapview.getMap().move(new CameraPosition(new Point(Preference.getFloat("last_lat"), Preference.getFloat("last_lon")), 16,0, 0));
         mPlaceMark = _b.mapview.getMap().getMapObjects().addPlacemark(new Point(Preference.getFloat("last_lat"), Preference.getFloat("last_lon")), mPlaceMarkImage);
         _b.mapview.getMap().addCameraListener(mCameraListener);
-
         WebRequest.create("/app/mobile/real_state", WebRequest.HttpMethod.GET, mLastState)
                 .request();
     }
@@ -267,6 +290,10 @@ public class FragmentMainPage extends BaseFragment {
             }
             case R.id.btnMyPos:
                 LocationService.getSingleLocation(mLocationListener);
+                break;
+            case R.id.btnMapFrom:
+                break;
+            case R.id.btnMapto:
                 break;
         }
     }
