@@ -23,5 +23,8 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
         fragmentTransaction.commit();
     }
 
-    protected abstract String tag();
+    protected String tag() {
+        System.out.println(getClass().getName());
+        return getClass().getName();
+    }
 }

@@ -46,11 +46,6 @@ public class FragmentTaxiOptions extends BaseFragment {
     }
 
     @Override
-    protected String tag() {
-        return "FragmentTaxiOptions";
-    }
-
-    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btnOptionsReady:

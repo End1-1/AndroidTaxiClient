@@ -90,9 +90,4 @@ public class FragmentIntro extends BaseFragment {
             }
         }
     };
-
-    @Override
-    protected String tag() {
-        return "FragmentIntro";
-    }
 }

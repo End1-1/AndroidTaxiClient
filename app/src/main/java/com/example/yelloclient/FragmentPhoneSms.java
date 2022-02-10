@@ -179,9 +179,4 @@ public class FragmentPhoneSms extends BaseFragment {
             }
         }
     };
-
-    @Override
-    protected String tag() {
-        return "FragmentPhoneSms";
-    }
 }

@@ -17,7 +17,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.webkit.WebResourceError;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
@@ -25,7 +24,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.yelloclient.classes.CarClass;
@@ -122,6 +120,13 @@ public class FragmentMainPage extends BaseFragment {
                         //replaceFragment(new FragmentSearchTaxi());
                         _b.llMainContainer.removeAllViews();
                         replaceFragment(new FragmentSearchTaxi());
+                        break;
+                    case Config.StateDriverAccept:
+                        _b.llMainContainer.removeAllViews();
+                        replaceFragment(new FragmentDriverAccept(jo));
+                        break;
+                    default:
+                        Dlg.alertDialog(getContext(), R.string.Error, String.format("Unknown state code was received: %d", jo.get("status").getAsInt()));
                         break;
                 }
                 Preference.setInt("last_state", jo.get("status").getAsShort());
@@ -503,11 +508,6 @@ public class FragmentMainPage extends BaseFragment {
                     }
                 })
                 .start();
-    }
-
-    @Override
-    protected String tag() {
-        return "FragmentMainPage";
     }
 
     class CarClassAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {

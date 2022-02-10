@@ -111,9 +111,4 @@ public class FragmentPhoneNumber extends BaseFragment {
             _b.txtMessage.setText(jo.get("message").getAsString());
         }
     };
-
-    @Override
-    protected String tag() {
-        return "FragmentPhoneNumber";
-    }
 }

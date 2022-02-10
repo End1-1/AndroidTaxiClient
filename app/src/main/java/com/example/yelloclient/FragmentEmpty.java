@@ -10,8 +10,6 @@ import android.view.ViewGroup;
 
 public class FragmentEmpty extends Fragment {
 
-    public static final String tag = "FragmentEmtpy";
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

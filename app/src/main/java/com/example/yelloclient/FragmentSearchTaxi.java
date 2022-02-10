@@ -32,11 +32,6 @@ public class FragmentSearchTaxi extends BaseFragment {
         }
     }
 
-    @Override
-    protected String tag() {
-        return "FragmentSearchTaxi";
-    }
-
     WebRequest.HttpResponse mCancelSearch = new WebRequest.HttpResponse() {
         @Override
         public void httpRespone(int httpReponseCode, String data) {
