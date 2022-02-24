@@ -10,16 +10,16 @@ public class Config {
     public static final int StateNone = 1;
     public static final int StatePendingSearch = 2;
     public static final int StateDriverAccept = 3;
-    public static final int StateDriverOnway = 4;
-    public static final int StateDriverOnplace = 5;
-    public static final int StateDriverOrderstarted = 6;
-    public static final int StateDriverOrderend = 7;
+    public static final int StateDriverOnWay = 4;
+    public static final int StateDriverOnPlace = 5;
+    public static final int StateDriverOrderStarted = 6;
+    public static final int StateDriverOrderEnd = 7;
 
     public static final int ACTION_OPEN_WEBSOCKET = 1;
 
     public static String host() {
-        return "newyellowtaxi.com";
-        //return "192.168.0.111";
+        //return "newyellowtaxi.com";
+        return "192.168.0.111";
     }
 
     public static String bearerKey() {

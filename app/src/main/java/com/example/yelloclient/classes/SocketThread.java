@@ -46,6 +46,7 @@ import javax.net.ssl.X509TrustManager;
 public class SocketThread implements Runnable {
 
     public static final byte SEND_TEXT = 0x1;
+    public static final String SOCKET_MESSAGE = "socket_message";
 
     private OutputStream mOutputStream;
     private InputStream mInputStream;
@@ -255,10 +256,11 @@ public class SocketThread implements Runnable {
                 int activityTimeout = jd.getInt("activity_timeout");
                 subscribeToChannel(Config.channelName(), socketId, activityTimeout);
             } else if (event.equals("pusher_internal:subscription_succeeded")) {
-                //Yo, man, we were logged in .
                 Log.d("LOGGIN IN", "SUBSCRIBED TO CHANNEL");
             } else {
-
+                Intent socketMessage = new Intent(SocketThread.SOCKET_MESSAGE);
+                socketMessage.putExtra("event", s);
+                LocalBroadcastManager.getInstance(TaxiApp.getContext()).sendBroadcast(socketMessage);
             }
         } catch (JSONException e) {
             e.printStackTrace();

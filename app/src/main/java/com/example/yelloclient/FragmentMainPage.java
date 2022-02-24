@@ -3,7 +3,10 @@ package com.example.yelloclient;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageDecoder;
@@ -24,11 +27,13 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.yelloclient.classes.CarClass;
 import com.example.yelloclient.classes.GeocoderAnswer;
 import com.example.yelloclient.classes.Messanger;
+import com.example.yelloclient.classes.SocketThread;
 import com.example.yelloclient.databinding.FragmentMainPageBinding;
 import com.example.yelloclient.databinding.ItemCarsBinding;
 import com.google.gson.JsonArray;
@@ -88,6 +93,43 @@ public class FragmentMainPage extends BaseFragment {
                 });
     }
 
+    private void changeState(int state, JsonObject jo) {
+        switch (state) {
+            case Config.StateNone:
+                mCoordGeocoding = true;
+                WebRequest.create("", WebRequest.HttpMethod.GET, mCoordToAddress)
+                        .setUrl(String.format("https://geocode-maps.yandex.ru/1.x/?apikey=%s&format=json&kind=house&geocode=%f,%f&results=1&sco=latlong",
+                                Config.yandexGeocodeKey(), Preference.getFloat("last_lat"), Preference.getFloat("last_lon")))
+                        .request();
+                break;
+            case Config.StatePendingSearch:
+                //replaceFragment(new FragmentSearchTaxi());
+                _b.llMainContainer.removeAllViews();
+                replaceFragment(new FragmentSearchTaxi());
+                break;
+            case Config.StateDriverAccept:
+                _b.llMainContainer.removeAllViews();
+                replaceFragment(new FragmentDriverAccept(jo));
+                break;
+            case Config.StateDriverOnWay:
+                _b.llMainContainer.removeAllViews();
+                replaceFragment(new FragmentDriverAccept(jo));
+                break;
+            case Config.StateDriverOnPlace:
+                _b.llMainContainer.removeAllViews();
+                replaceFragment(new FragmentDriverWaitingYou(jo));
+                break;
+            case Config.StateDriverOrderStarted:
+                _b.llMainContainer.removeAllViews();
+                replaceFragment(new FragmentOrderStarted());
+                break;
+            default:
+                Dlg.alertDialog(getContext(), R.string.Error, String.format("Unknown state code was received: %d", jo.get("status").getAsInt()));
+                break;
+        }
+        Preference.setInt("last_state", state);
+    }
+
     WebRequest.HttpResponse mBroadcastAuth = new WebRequest.HttpResponse() {
         @Override
         public void httpRespone(int httpReponseCode, String data) {
@@ -108,28 +150,7 @@ public class FragmentMainPage extends BaseFragment {
                         .setParameter("socket_id", Config.socketId())
                         .request();
                 JsonObject jo = JsonParser.parseString(data).getAsJsonObject();
-                switch (jo.get("status").getAsShort()) {
-                    case Config.StateNone:
-                        mCoordGeocoding = true;
-                        WebRequest.create("", WebRequest.HttpMethod.GET, mCoordToAddress)
-                                .setUrl(String.format("https://geocode-maps.yandex.ru/1.x/?apikey=%s&format=json&kind=house&geocode=%f,%f&results=1&sco=latlong",
-                                        Config.yandexGeocodeKey(), Preference.getFloat("last_lat"), Preference.getFloat("last_lon")))
-                                .request();
-                        break;
-                    case Config.StatePendingSearch:
-                        //replaceFragment(new FragmentSearchTaxi());
-                        _b.llMainContainer.removeAllViews();
-                        replaceFragment(new FragmentSearchTaxi());
-                        break;
-                    case Config.StateDriverAccept:
-                        _b.llMainContainer.removeAllViews();
-                        replaceFragment(new FragmentDriverAccept(jo));
-                        break;
-                    default:
-                        Dlg.alertDialog(getContext(), R.string.Error, String.format("Unknown state code was received: %d", jo.get("status").getAsInt()));
-                        break;
-                }
-                Preference.setInt("last_state", jo.get("status").getAsShort());
+                changeState(jo.get("status").getAsShort(), jo);
             } else {
 
             }
@@ -206,6 +227,26 @@ public class FragmentMainPage extends BaseFragment {
         }
     };
 
+    BroadcastReceiver mSocketReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String e = intent.getStringExtra("event");
+            System.out.println(e);
+            JsonObject jo = JsonParser.parseString(e).getAsJsonObject();
+            if (jo.get("event").getAsString().equalsIgnoreCase("Src\\Broadcasting\\Broadcast\\Client\\DriverOnAcceptOrderEvent")) {
+                changeState(Config.StateDriverAccept, JsonParser.parseString(jo.get("data").getAsString()).getAsJsonObject().getAsJsonObject("payload"));
+            } else if (jo.get("event").getAsString().equalsIgnoreCase("Src\\Broadcasting\\Broadcast\\Client\\DriverOnWayOrderEvent")) {
+                changeState(Config.StateDriverOnWay, JsonParser.parseString(jo.get("data").getAsString()).getAsJsonObject().getAsJsonObject("payload"));
+            } else if (jo.get("event").getAsString().equalsIgnoreCase("Src\\Broadcasting\\Broadcast\\Client\\DriverInPlace")) {
+                changeState(Config.StateDriverOnPlace, JsonParser.parseString(jo.get("data").getAsString()).getAsJsonObject().getAsJsonObject("payload"));
+            } else if (jo.get("event").getAsString().equalsIgnoreCase("Src\\Broadcasting\\Broadcast\\Client\\OrderStarted")) {
+                changeState(Config.StateDriverOrderStarted, JsonParser.parseString(jo.get("data").getAsString()).getAsJsonObject().getAsJsonObject("payload"));
+            } else if (jo.get("event").getAsString().equalsIgnoreCase("Src\\Broadcasting\\Broadcast\\Client\\ClientOrderEndData")) {
+                changeState(Config.StateDriverOrderEnd, JsonParser.parseString(jo.get("data").getAsString()).getAsJsonObject().getAsJsonObject("payload"));
+            }
+        }
+    };
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         _b = FragmentMainPageBinding.inflate(getLayoutInflater(), container, false);
@@ -268,6 +309,7 @@ public class FragmentMainPage extends BaseFragment {
         _b.mapview.getMap().addCameraListener(mCameraListener);
         WebRequest.create("/app/mobile/real_state", WebRequest.HttpMethod.GET, mLastState)
                 .request();
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mSocketReceiver, new IntentFilter(SocketThread.SOCKET_MESSAGE));
     }
 
     @Override
@@ -276,6 +318,7 @@ public class FragmentMainPage extends BaseFragment {
         _b.mapview.getMap().removeCameraListener(mCameraListener);
         _b.mapview.getMap().getMapObjects().remove(mPlaceMark);
         _b.mapview.onStop();
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mSocketReceiver);
     }
 
     @Override

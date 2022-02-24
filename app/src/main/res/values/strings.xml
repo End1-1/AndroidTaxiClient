@@ -28,6 +28,7 @@
     <string name="Back">Назад</string>
     <string name="Ready">Готово</string>
     <string name="SEARCHINGFORTAXI">ПОИСК АВТОМОБИЛЯ</string>
+    <string name="ORDER_STARTED">ПОЕЗДКА НАЧАЛАСЬ</string>
     <string name="FoundedTaxies">Найдено несколько машин. Сейчас мы выбираем наилучший вариант для вас!</string>
     <string name="CANCEL">ОТМЕНА</string>
     <string name="READY">ГОТОВО</string>

@@ -5,27 +5,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.yelloclient.databinding.FragmentDriverAcceptBinding;
+import com.example.yelloclient.databinding.FragmentDriverWaitingYouBinding;
 import com.google.gson.JsonObject;
 
-public class FragmentDriverAccept extends BaseFragment {
+public class FragmentDriverWaitingYou extends BaseFragment {
 
-    private FragmentDriverAcceptBinding _b;
+    private FragmentDriverWaitingYouBinding _b;
     private JsonObject mData;
 
-
-    public FragmentDriverAccept(JsonObject o) {
+    public FragmentDriverWaitingYou(JsonObject jo) {
         super();
-        mData = o;
+        mData = jo;
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        _b = FragmentDriverAcceptBinding.inflate(inflater, container, false);
-        _b.btnCallDriver.setOnClickListener(this);
-        _b.btnCancelOrder.setOnClickListener(this);
-        _b.btnChat.setOnClickListener(this);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        _b = FragmentDriverWaitingYouBinding.inflate(inflater, container, false);
         _b.txtMessage.setText(mData.get("message").getAsString());
         _b.txtCar.setText(String.format("%s %s %s",
                 mData.getAsJsonObject("payload").getAsJsonObject("car").get("color").getAsString(),
