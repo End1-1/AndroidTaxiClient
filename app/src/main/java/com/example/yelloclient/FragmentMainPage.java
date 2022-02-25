@@ -31,11 +31,14 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.yelloclient.classes.CarClass;
+import com.example.yelloclient.classes.Driver;
 import com.example.yelloclient.classes.GeocoderAnswer;
 import com.example.yelloclient.classes.Messanger;
 import com.example.yelloclient.classes.SocketThread;
 import com.example.yelloclient.databinding.FragmentMainPageBinding;
 import com.example.yelloclient.databinding.ItemCarsBinding;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -122,6 +125,10 @@ public class FragmentMainPage extends BaseFragment {
             case Config.StateDriverOrderStarted:
                 _b.llMainContainer.removeAllViews();
                 replaceFragment(new FragmentOrderStarted());
+                break;
+            case Config.StateDriverOrderEnd:
+                _b.llMainContainer.removeAllViews();
+                replaceFragment(new FragmentVoteAfterOrder());
                 break;
             default:
                 Dlg.alertDialog(getContext(), R.string.Error, String.format("Unknown state code was received: %d", jo.get("status").getAsInt()));
@@ -234,15 +241,18 @@ public class FragmentMainPage extends BaseFragment {
             System.out.println(e);
             JsonObject jo = JsonParser.parseString(e).getAsJsonObject();
             if (jo.get("event").getAsString().equalsIgnoreCase("Src\\Broadcasting\\Broadcast\\Client\\DriverOnAcceptOrderEvent")) {
-                changeState(Config.StateDriverAccept, JsonParser.parseString(jo.get("data").getAsString()).getAsJsonObject().getAsJsonObject("payload"));
+                changeState(Config.StateDriverAccept, JsonParser.parseString(jo.get("data").getAsString()).getAsJsonObject());
             } else if (jo.get("event").getAsString().equalsIgnoreCase("Src\\Broadcasting\\Broadcast\\Client\\DriverOnWayOrderEvent")) {
-                changeState(Config.StateDriverOnWay, JsonParser.parseString(jo.get("data").getAsString()).getAsJsonObject().getAsJsonObject("payload"));
+                changeState(Config.StateDriverOnWay, JsonParser.parseString(jo.get("data").getAsString()).getAsJsonObject());
             } else if (jo.get("event").getAsString().equalsIgnoreCase("Src\\Broadcasting\\Broadcast\\Client\\DriverInPlace")) {
-                changeState(Config.StateDriverOnPlace, JsonParser.parseString(jo.get("data").getAsString()).getAsJsonObject().getAsJsonObject("payload"));
+                changeState(Config.StateDriverOnPlace, JsonParser.parseString(jo.get("data").getAsString()).getAsJsonObject());
             } else if (jo.get("event").getAsString().equalsIgnoreCase("Src\\Broadcasting\\Broadcast\\Client\\OrderStarted")) {
-                changeState(Config.StateDriverOrderStarted, JsonParser.parseString(jo.get("data").getAsString()).getAsJsonObject().getAsJsonObject("payload"));
+                changeState(Config.StateDriverOrderStarted, JsonParser.parseString(jo.get("data").getAsString()).getAsJsonObject());
             } else if (jo.get("event").getAsString().equalsIgnoreCase("Src\\Broadcasting\\Broadcast\\Client\\ClientOrderEndData")) {
-                changeState(Config.StateDriverOrderEnd, JsonParser.parseString(jo.get("data").getAsString()).getAsJsonObject().getAsJsonObject("payload"));
+                changeState(Config.StateDriverOrderEnd, JsonParser.parseString(jo.get("data").getAsString()).getAsJsonObject());
+            } else if (jo.get("event").getAsString().equalsIgnoreCase("Src\\Broadcasting\\Broadcast\\Client\\ListenRadiusTaxiEvent")) {
+                JsonObject joc = JsonParser.parseString(jo.get("data").getAsString()).getAsJsonObject();
+                updateTaxiOnMap(joc.getAsJsonArray("taxis"));
             }
         }
     };
@@ -375,6 +385,15 @@ public class FragmentMainPage extends BaseFragment {
         _b.btnRent.setEnabled(!v);
         _b.btnOptions.setEnabled(!v);
         _b.btnPaymentType.setEnabled(!v);
+    }
+
+    private void updateTaxiOnMap(JsonArray ja) {
+        for (int i = 0; i < ja.size(); i++) {
+            JsonObject jo = ja.get(i).getAsJsonObject();
+            Gson g = new GsonBuilder().create();
+            Driver d = g.fromJson(jo, Driver.class);
+            _b.mapview.getMap().getMapObjects().addPlacemark(new Point(d.current_coordinate.lat, d.current_coordinate.lut));
+        }
     }
 
     private void initCoin(WebRequest.HttpPostLoad post) {
