@@ -35,41 +35,53 @@
 
                     <RadioGroup
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent" >
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center">
 
                         <RadioButton
                             android:id="@+id/rb1"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_margin="3dp"
                             android:minHeight="48dp"
+                            android:background="@drawable/redstari"
                             android:text="RadioButton" />
 
                         <RadioButton
                             android:id="@+id/rb5"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_margin="3dp"
                             android:minHeight="48dp"
+                            android:background="@drawable/redstari"
                             android:text="RadioButton" />
 
                         <RadioButton
                             android:id="@+id/rb4"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_margin="3dp"
                             android:minHeight="48dp"
+                            android:background="@drawable/redstari"
                             android:text="RadioButton" />
 
                         <RadioButton
                             android:id="@+id/rb3"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_margin="3dp"
                             android:minHeight="48dp"
+                            android:background="@drawable/redstari"
                             android:text="RadioButton" />
 
                         <RadioButton
                             android:id="@+id/rb2"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_margin="3dp"
                             android:minHeight="48dp"
+                            android:background="@drawable/redstari"
                             android:text="RadioButton" />
 
                     </RadioGroup>

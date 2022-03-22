@@ -17,6 +17,11 @@ public class FragmentVoteAfterOrder extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         _b = FragmentVoteAfterOrderBinding.inflate(inflater, container, false);
+        _b.rb1.setOnClickListener(this);
+        _b.rb2.setOnClickListener(this);
+        _b.rb3.setOnClickListener(this);
+        _b.rb4.setOnClickListener(this);
+        _b.rb5.setOnClickListener(this);
         return _b.getRoot();
     }
 

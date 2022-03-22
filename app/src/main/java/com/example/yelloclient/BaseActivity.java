@@ -11,6 +11,7 @@ public class BaseActivity extends AppCompatActivity {
     public static final int FC_NAVIGATE_SMS_CODE = 2;
     public static final int FC_NAVIGATE_MAINPAGE = 3;
     public static final int FC_NAVIGATE_INTRO = 4;
+    public static final int FC_NAVIGET_TAXI_OPTIONS = 5;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

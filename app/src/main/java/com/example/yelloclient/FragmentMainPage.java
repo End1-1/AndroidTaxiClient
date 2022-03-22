@@ -58,47 +58,16 @@ import java.util.Calendar;
 public class FragmentMainPage extends BaseFragment {
 
     private FragmentMainPageBinding _b;
-    private boolean mLoading = false;
     private boolean mCoordGeocoding = false;
     private boolean mMainFrameDown = false;
     private float cx = 0;
     private float cy = 0;
 
-    public FragmentMainPage() {
-        mAddr = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                new ActivityResultCallback<ActivityResult>() {
-                    @Override
-                    public void onActivityResult(ActivityResult result) {
-                        if (result.getResultCode() == Activity.RESULT_OK) {
-                            Intent data = result.getData();
-                            if (data.getStringExtra("from_display") != null) {
-                                Preference.setString("from_display", data.getStringExtra("from_display"));
-                                Preference.setString("from_title", data.getStringExtra("from_title"));
-                                Preference.setString("from_subtitle", data.getStringExtra("from_subtitle"));
-                                _b.edtFrom.setText(Preference.getString("from_title"));
-                            } else {
-                                Preference.setString("from_display", "");
-                                _b.edtFrom.setText("");
-                            }
-                            if (data.getStringExtra("to_display") != null) {
-                                Preference.setString("to_display", data.getStringExtra("to_display"));
-                                Preference.setString("to_title", data.getStringExtra("to_title"));
-                                Preference.setString("to_subtitle", data.getStringExtra("to_subtitle"));
-                                _b.edtTo.setText(Preference.getString("to_title"));
-                            } else {
-                                Preference.setString("to_display", "");
-                                _b.edtTo.setText("");
-                            }
-                            initCoin(null);
-                        }
-                    }
-                });
-    }
-
     private void changeState(int state, JsonObject jo) {
         switch (state) {
             case Config.StateNone:
+                _b.llMainContainer.removeAllViews();
+                replaceFragment(new FragmentBeforeOrder());
                 mCoordGeocoding = true;
                 WebRequest.create("", WebRequest.HttpMethod.GET, mCoordToAddress)
                         .setUrl(String.format("https://geocode-maps.yandex.ru/1.x/?apikey=%s&format=json&kind=house&geocode=%f,%f&results=1&sco=latlong",
@@ -164,24 +133,6 @@ public class FragmentMainPage extends BaseFragment {
         }
     };
 
-    WebRequest.HttpResponse mInitCoin = new WebRequest.HttpResponse() {
-        @Override
-        public void httpRespone(int httpReponseCode, String data) {
-            setLoading(false);
-            if (httpReponseCode == -1) {
-                Dlg.alertDialog(getContext(), R.string.Error, R.string.InternetFail);
-            } else if (httpReponseCode < 300) {
-                JsonObject jo = new JsonObject();
-                JsonArray ja = JsonParser.parseString(data).getAsJsonObject().get("data").getAsJsonArray();
-                jo.add("car_classes", ja);
-                ((MainActivity) mActivity).setCarClasses(jo);
-                _b.rvCars.getAdapter().notifyDataSetChanged();
-            } else  {
-                JsonObject jo = JsonParser.parseString(data).getAsJsonObject();
-            }
-        }
-    };
-
     WebRequest.HttpResponse mCoordToAddress = new WebRequest.HttpResponse() {
         @Override
         public void httpRespone(int httpReponseCode, String data) {
@@ -206,28 +157,13 @@ public class FragmentMainPage extends BaseFragment {
                     Preference.setString("from_subtitle", "");
                     Preference.setFloat("last_lat", (float) ga.mPoint.getLatitude());
                     Preference.setFloat("last_lon", (float) ga.mPoint.getLongitude());
-                    _b.edtFrom.setText(ga.mStreet + (ga.mHouse.isEmpty() ? "" : ", " + ga.mHouse));
-                    setLoading(true);
-                    initCoin(null);
+                    Intent cAddressFrom = new Intent(BaseFragment.mBaseFragmentFilter);
+                    cAddressFrom.putExtra("cmd", BaseFragment.SET_ADDRESS_FROM_STRING);
+                    cAddressFrom.putExtra("address", ga.mStreet + (ga.mHouse.isEmpty() ? "" : ", " + ga.mHouse));
+                    LocalBroadcastManager.getInstance(getContext()).sendBroadcast(cAddressFrom);
                 } else {
 
                 }
-            } else  {
-                JsonObject jo = JsonParser.parseString(data).getAsJsonObject();
-            }
-        }
-    };
-
-    WebRequest.HttpResponse mOrderNow = new WebRequest.HttpResponse() {
-        @Override
-        public void httpRespone(int httpReponseCode, String data) {
-            setLoading(false);
-            if (httpReponseCode == -1) {
-
-            } else if (httpReponseCode < 300) {
-                JsonObject jo = JsonParser.parseString(data).getAsJsonObject();
-                _b.llMainContainer.removeAllViews();
-                replaceFragment(new FragmentSearchTaxi());
             } else  {
                 JsonObject jo = JsonParser.parseString(data).getAsJsonObject();
             }
@@ -261,20 +197,6 @@ public class FragmentMainPage extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         _b = FragmentMainPageBinding.inflate(getLayoutInflater(), container, false);
         MapKitFactory.initialize(getContext());
-        _b.btnMinimize.setOnClickListener(this);
-        _b.edtFrom.setOnClickListener(this);
-        _b.edtTo.setOnClickListener(this);
-        _b.btnOptions.setOnClickListener(this);
-        _b.btnORDER.setOnClickListener(this);
-        _b.btnPaymentType.setOnClickListener(this);
-        _b.btnMyPos.setOnClickListener(this);
-        _b.rvCars.setAdapter(new CarClassAdapter());
-        _b.edtFrom.setText(Preference.getString("from_title"));
-        _b.edtTo.setText(Preference.getString("to_title"));
-        _b.btnMapFrom.setOnClickListener(this);
-        _b.btnMapto.setOnClickListener(this);
-        _b.btnTaxi.setOnClickListener(this);
-        _b.btnRent.setOnClickListener(this);
         ViewTreeObserver vto = _b.getRoot().getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -333,58 +255,20 @@ public class FragmentMainPage extends BaseFragment {
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.btnOptions:
+
+    }
+
+    @Override
+    protected void messageHandler(int msg, Intent i) {
+        switch (msg) {
+            case BaseFragment.SET_FRAGMENT_TAXIOTPIONS:
                 _b.llMainContainer.removeAllViews();
                 replaceFragment(new FragmentTaxiOptions());
                 break;
-            case R.id.btnMinimize:
-                showHideFragment();
-                break;
-            case R.id.edtFrom: {
-                Intent intent = new Intent(getContext(), ActivitySuggestAddress.class);
-                intent.putExtra("from", true);
-                mAddr.launch(intent);
-                break;
-            }
-            case R.id.edtTo: {
-                Intent intent = new Intent(getContext(), ActivitySuggestAddress.class);
-                intent.putExtra("from", false);
-                mAddr.launch(intent);
-                break;
-            }
-            case R.id.btnORDER: {
-                initCoin(() -> initOrder());
-                break;
-            }
-            case R.id.btnTaxi:
-                _b.btnTaxi.setBackground(getContext().getDrawable(R.drawable.btn_transparent1selected));
-                _b.btnRent.setBackground(getContext().getDrawable(R.drawable.btn_transparent1));
-                break;
-            case R.id.btnRent:
-                _b.btnRent.setBackground(getContext().getDrawable(R.drawable.btn_transparent1selected));
-                _b.btnTaxi.setBackground(getContext().getDrawable(R.drawable.btn_transparent1));
-                break;
-            case R.id.btnMyPos:
+            case BaseFragment.SET_MY_LOCATION:
                 LocationService.getSingleLocation(mLocationListener);
                 break;
-            case R.id.btnMapFrom:
-                break;
-            case R.id.btnMapto:
-                break;
         }
-    }
-
-    private void setLoading(boolean v) {
-        mLoading = v;
-        _b.rvCars.getAdapter().notifyDataSetChanged();
-        _b.rvCars.setEnabled(!v);
-        _b.btnMinimize.setEnabled(!v);
-        _b.btnTaxi.setEnabled(!v);
-        _b.btnORDER.setEnabled(!v);
-        _b.btnRent.setEnabled(!v);
-        _b.btnOptions.setEnabled(!v);
-        _b.btnPaymentType.setEnabled(!v);
     }
 
     private void updateTaxiOnMap(JsonArray ja) {
@@ -394,135 +278,6 @@ public class FragmentMainPage extends BaseFragment {
             Driver d = g.fromJson(jo, Driver.class);
             _b.mapview.getMap().getMapObjects().addPlacemark(new Point(d.current_coordinate.lat, d.current_coordinate.lut));
         }
-    }
-
-    private void initCoin(WebRequest.HttpPostLoad post) {
-        setLoading(true);
-
-        JsonObject jo = new JsonObject();
-
-        ((MainActivity) mActivity).mCurrentCarClass  = ((MainActivity) mActivity).mCarClasses.getCurrent().class_id;
-        JsonObject jcar = new JsonObject();
-        jcar.addProperty("class", ((MainActivity) mActivity).mCurrentCarClass);
-        JsonArray jcarOptions = new JsonArray();
-        for (int o: ((MainActivity)  mActivity).mCarOptions) {
-            jcarOptions.add(o);
-        }
-        jcar.add("options", jcarOptions);
-        jcar.addProperty("comments", Preference.getString("driver_comment"));
-        jo.add("car", jcar);
-
-        JsonObject jpayment = new JsonObject();
-        jpayment.addProperty("type", ((MainActivity) mActivity).mPaymentTypes.getCurrent().id);
-        jpayment.addProperty("company", ((MainActivity) mActivity).mPaymentCompany);
-        jo.add("payment", jpayment);
-
-        JsonObject jroute = new JsonObject();
-        JsonArray jfromCoord = new JsonArray();
-        jfromCoord.add(Preference.getFloat("last_lat"));
-        jfromCoord.add(Preference.getFloat("last_lon"));
-        jroute.add("from", jfromCoord);
-        jroute.addProperty("from_address", Preference.getString("from_display"));
-
-        JsonArray jtoCoord = new JsonArray();
-        if (Preference.getFloat("to_lat") > 0.01) {
-            jtoCoord.add(Preference.getFloat("to_lat"));
-            jtoCoord.add(Preference.getFloat("to_lon"));
-        }
-        jroute.add("to", jtoCoord);
-        jroute.addProperty("to_address", Preference.getString("to_display"));
-        jo.add("route", jroute);
-
-        JsonObject jtime = new JsonObject();
-        android.text.format.DateFormat df = new android.text.format.DateFormat();
-        jtime.addProperty("zone", "Asia/Yerevan");
-        jtime.addProperty("create_time", df.format("yyyy-MM-dd HH:mm", Calendar.getInstance().getTime()).toString());
-        jtime.addProperty("time", df.format("yyyy-MM-dd HH:mm", Calendar.getInstance().getTime()).toString());
-        jo.add("time", jtime);
-
-        JsonObject jphone = new JsonObject();
-        jphone.addProperty("client", Preference.getString("phone"));
-        jphone.addProperty("passenger", "");
-        jo.add("phone", jphone);
-
-        JsonObject jmeet = new JsonObject();
-        jmeet.addProperty("is_meet", false);
-        jmeet.addProperty("place_id", "");
-        jmeet.addProperty("place_type", "");
-        jmeet.addProperty("number", "");
-        jmeet.addProperty("text", "");
-        jo.add("meet", jmeet);
-
-        jo.addProperty("is_rent", ((MainActivity) mActivity).mIsRent);
-        jo.addProperty("rent_time", ((MainActivity) mActivity).mRentTime);
-
-        WebRequest.create("/app/mobile/init_coin", WebRequest.HttpMethod.POST, mInitCoin)
-                .setPostLoad(post)
-                .setBody(jo.toString())
-                .request();
-    }
-
-    public void initOrder() {
-        setLoading(true);
-
-        JsonObject jo = new JsonObject();
-
-        JsonObject jcar = new JsonObject();
-        jcar.addProperty("class", ((MainActivity) mActivity).mCarClasses.getCurrent().class_id);
-        JsonArray jcarOptions = new JsonArray();
-        for (int o: ((MainActivity)  mActivity).mCarOptions) {
-            jcarOptions.add(o);
-        }
-        jcar.add("options", jcarOptions);
-        jcar.addProperty("comments", Preference.getString("driver_comment"));
-        jo.add("car", jcar);
-
-        JsonObject jpayment = new JsonObject();
-        jpayment.addProperty("type", ((MainActivity) mActivity).mPaymentTypes.getCurrent().id);
-        jpayment.addProperty("company", ((MainActivity) mActivity).mPaymentCompany);
-        jo.add("payment", jpayment);
-
-        JsonObject jroute = new JsonObject();
-        JsonArray jfromCoord = new JsonArray();
-        jfromCoord.add(Preference.getFloat("last_lat"));
-        jfromCoord.add(Preference.getFloat("last_lon"));
-        jroute.add("from", jfromCoord);
-        jroute.addProperty("from_address", Preference.getString("from_display"));
-
-        JsonArray jtoCoord = new JsonArray();
-        if (Preference.getFloat("to_lat") > 0.01) {
-            jtoCoord.add(Preference.getFloat("to_lat"));
-            jtoCoord.add(Preference.getFloat("to_lon"));
-        }
-        jroute.add("to", jtoCoord);
-        jroute.addProperty("to_address", Preference.getString("to_display"));
-        jo.add("route", jroute);
-
-        JsonObject jtime = new JsonObject();
-        android.text.format.DateFormat df = new android.text.format.DateFormat();
-        jtime.addProperty("zone", "Asia/Yerevan");
-        jtime.addProperty("create_time", df.format("yyyy-MM-dd HH:mm", Calendar.getInstance().getTime()).toString());
-        jtime.addProperty("time", df.format("yyyy-MM-dd HH:mm", Calendar.getInstance().getTime()).toString());
-        jo.add("time", jtime);
-
-        JsonObject jphone = new JsonObject();
-        jphone.addProperty("client", Preference.getString("phone"));
-        jphone.addProperty("passenger", "");
-        jo.add("phone", jphone);
-
-        JsonObject jmeet = new JsonObject();
-        jmeet.addProperty("is_meet", false);
-        jmeet.addProperty("place_id", "");
-        jmeet.addProperty("place_type", "");
-        jmeet.addProperty("number", "");
-        jmeet.addProperty("text", "");
-        jo.add("meet", jmeet);
-
-        jo.addProperty("is_rent", ((MainActivity) mActivity).mIsRent);
-        jo.addProperty("rent_time", ((MainActivity) mActivity).mRentTime);
-        WebRequest.create("/app/mobile/init_order", WebRequest.HttpMethod.POST, mOrderNow)
-                .setBody(jo.toString())
-                .request();
     }
 
     PlacemarkMapObject mPlaceMark;
@@ -558,90 +313,6 @@ public class FragmentMainPage extends BaseFragment {
         }
     };
 
-    public void showHideFragment() {
-        int top = mMainFrameDown  ? 0 : _b.getRoot().getMeasuredHeight() - _b.llMainContainer.getMeasuredHeight() - _b.llCont2.getMeasuredHeight() - _b.btnMyPos.getMeasuredHeight();
-        _b.fr.animate().translationY(top).setDuration(500)
-                .setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        super.onAnimationEnd(animation);
-                        _b.fr.animate().setListener(null);
-                        mMainFrameDown = !mMainFrameDown;
-                    }
-                })
-                .start();
-    }
-
-    class CarClassAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-
-        private Drawable drawable;
-        public CarClassAdapter() {
-            ImageDecoder.Source source;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-                source = ImageDecoder.createSource(getResources(), R.drawable.load1);
-                try {
-                    drawable = ImageDecoder.decodeDrawable(source);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                drawable = AppCompatResources.getDrawable(getContext(), R.drawable.load1);
-            }
-        }
-
-        private class VH extends RecyclerView.ViewHolder implements View.OnClickListener {
-            public ItemCarsBinding _b;
-
-            public VH(ItemCarsBinding b) {
-                super(b.getRoot());
-                _b = b;
-                _b.getRoot().setOnClickListener(this);
-            }
-
-            public void onBind(int position) {
-                CarClass cc = ((MainActivity) mActivity).mCarClasses.car_classes.get(position);
-                _b.txtCarClass.setText(cc.name);
-                _b.txtPrice.setText(String.format("%.0f %s", cc.min_price < 0.1 ? cc.coin : cc.min_price, cc.currency));
-                _b.img.setImageBitmap(cc._image);
-                _b.img.setAlpha(cc.selected == 1 ? 1f : 0.2f);
-                _b.gif.setImageDrawable(drawable);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    ((AnimatedImageDrawable) drawable).start();
-                }
-                _b.gif.setVisibility(mLoading ? View.VISIBLE : View.INVISIBLE);
-            }
-
-            @Override
-            public void onClick(View view) {
-                if (mLoading) {
-                    return;
-                }
-                for (int i = 0; i < ((MainActivity) mActivity).mCarClasses.car_classes.size(); i++) {
-                    ((MainActivity) mActivity).mCarClasses.car_classes.get(i).selected = 0;
-                }
-                ((MainActivity) mActivity).mCarClasses.car_classes.get(getAdapterPosition()).selected = 1;
-                notifyDataSetChanged();
-            }
-        }
-
-        @NonNull
-        @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            ItemCarsBinding b = ItemCarsBinding.inflate(getLayoutInflater(), parent, false);
-            return new VH(b);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-            ((VH) holder).onBind(position);
-        }
-
-        @Override
-        public int getItemCount() {
-            return ((MainActivity) mActivity).mCarClasses.car_classes.size();
-        }
-    }
-
     LocationService.LocationChangeListener mLocationListener = new LocationService.LocationChangeListener() {
         @Override
         public void location(Location l) {
@@ -649,9 +320,7 @@ public class FragmentMainPage extends BaseFragment {
         }
     };
 
-    ActivityResultLauncher<Intent> mAddr;
-
     public void reset() {
-        ((MainActivity) mActivity).fragmentCallback(BaseActivity.FC_NAVIGATE_MAINPAGE);
+        mActivity.fragmentCallback(BaseActivity.FC_NAVIGATE_MAINPAGE);
     }
 }
