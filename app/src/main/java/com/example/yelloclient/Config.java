@@ -19,7 +19,7 @@ public class Config {
 
     public static String host() {
         return "newyellowtaxi.com";
-        //return "192.168.0.111";
+//        return "192.168.0.111";
     }
 
     public static String bearerKey() {

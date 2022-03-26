@@ -45,35 +45,8 @@
                             android:layout_height="48dp"
                             android:layout_margin="3dp"
                             android:minHeight="48dp"
-                            android:background="@drawable/redstari"
-                            android:text="RadioButton" />
-
-                        <RadioButton
-                            android:id="@+id/rb5"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:layout_margin="3dp"
-                            android:minHeight="48dp"
-                            android:background="@drawable/redstari"
-                            android:text="RadioButton" />
-
-                        <RadioButton
-                            android:id="@+id/rb4"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:layout_margin="3dp"
-                            android:minHeight="48dp"
-                            android:background="@drawable/redstari"
-                            android:text="RadioButton" />
-
-                        <RadioButton
-                            android:id="@+id/rb3"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:layout_margin="3dp"
-                            android:minHeight="48dp"
-                            android:background="@drawable/redstari"
-                            android:text="RadioButton" />
+                            android:button="@null"
+                            android:background="@drawable/redstari" />
 
                         <RadioButton
                             android:id="@+id/rb2"
@@ -81,9 +54,35 @@
                             android:layout_height="48dp"
                             android:layout_margin="3dp"
                             android:minHeight="48dp"
-                            android:background="@drawable/redstari"
-                            android:text="RadioButton" />
+                            android:button="@null"
+                            android:background="@drawable/redstari" />
 
+                        <RadioButton
+                            android:id="@+id/rb3"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_margin="3dp"
+                            android:minHeight="48dp"
+                            android:button="@null"
+                            android:background="@drawable/redstari" />
+
+                        <RadioButton
+                            android:id="@+id/rb4"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_margin="3dp"
+                            android:minHeight="48dp"
+                            android:button="@null"
+                            android:background="@drawable/redstari" />
+
+                        <RadioButton
+                            android:id="@+id/rb5"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_margin="3dp"
+                            android:minHeight="48dp"
+                            android:button="@null"
+                            android:background="@drawable/redstari"/>
                     </RadioGroup>
                 </LinearLayout>
             </LinearLayout>
